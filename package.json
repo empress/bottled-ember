@@ -1,5 +1,5 @@
 {
-  "name": "bottled-ember",
+  "name": "dummy",
   "version": "0.0.0",
   "private": true,
   "description": "Small description for bottled-ember goes here",
@@ -22,11 +22,16 @@
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test"
   },
+  "dependencies": {
+    "@glimmer/component": "^1.0.4",
+    "@glimmer/tracking": "^1.0.4",
+    "ember-cli-htmlbars": "^5.7.1",
+    "ember-resolver": "^8.0.2",
+    "ember-source": "~3.28.0"
+  },
   "devDependencies": {
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.4.2",
-    "@glimmer/component": "^1.0.4",
-    "@glimmer/tracking": "^1.0.4",
     "babel-eslint": "^10.1.0",
     "broccoli-asset-rev": "^3.0.0",
     "ember-auto-import": "^1.11.3",
@@ -34,7 +39,6 @@
     "ember-cli-app-version": "^5.0.0",
     "ember-cli-babel": "^7.26.6",
     "ember-cli-dependency-checker": "^3.2.0",
-    "ember-cli-htmlbars": "^5.7.1",
     "ember-cli-inject-live-reload": "^2.1.0",
     "ember-cli-sri": "^2.1.1",
     "ember-cli-terser": "^4.0.2",
@@ -45,8 +49,6 @@
     "ember-maybe-import-regenerator": "^0.1.6",
     "ember-page-title": "^6.2.2",
     "ember-qunit": "^5.1.4",
-    "ember-resolver": "^8.0.2",
-    "ember-source": "~3.28.0",
     "ember-template-lint": "^3.6.0",
     "ember-welcome-page": "^4.0.0",
     "eslint": "^7.32.0",
