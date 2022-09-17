@@ -33,6 +33,7 @@ module.exports = {
         './config/**/*.js',
         './lib/*/index.js',
         './server/**/*.js',
+        './bin/bottled-ember',
       ],
       parserOptions: {
         sourceType: 'script',
