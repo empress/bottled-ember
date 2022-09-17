@@ -2,6 +2,8 @@
 'use strict';
 
 const findCacheDir = require('find-cache-dir');
+const minimist = require('minimist');
+
 const {
   existsSync,
   mkdirSync,
@@ -14,7 +16,7 @@ const {
 } = require('fs');
 const { join } = require('path');
 
-const argv = require('minimist')(process.argv.slice(2));
+const argv = minimist(process.argv.slice(2));
 
 const emberVersion = argv.emberVersion || '4.0';
 
@@ -129,14 +131,20 @@ async function run() {
     });
   }
 
+  const commandArgs = [
+    'ember',
+    argv._[0] || 'serve',
+    '--output-path',
+    join(process.cwd(), 'dist'),
+  ];
+
+  if(argv.environment) {
+    commandArgs.push('--environment', argv.environment);
+  }
+
   await execa(
     'npx',
-    [
-      'ember',
-      argv._[0] || 'serve',
-      '--output-path',
-      join(process.cwd(), 'dist'),
-    ],
+    commandArgs,
     {
       cwd: cacheDir,
       stderr: 'inherit',
