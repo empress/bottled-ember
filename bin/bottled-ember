@@ -82,6 +82,32 @@ async function run() {
     }`
     );
 
+    await rmSync(join(cacheDir, 'ember-cli-build.js'));
+
+    await writeFileSync(
+      join(cacheDir, 'ember-cli-build.js'),
+      `'use strict';
+
+      const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+      let buildConfig = {}
+
+      try {
+        const localConfig = require('${join(process.cwd(), 'config')}');
+
+        if (localConfig['ember-cli-build']) {
+          buildConfig = localConfig['ember-cli-build'];
+        }
+      } catch {
+        // do nothing
+      }
+
+      module.exports = function (defaults) {
+        let app = new EmberApp(defaults, buildConfig);
+        return app.toTree();
+      };
+      `
+    )
+
     console.log('installing linking your local app 🤖');
 
     await execa('npx', ['pnpm', 'install', process.cwd()], {
