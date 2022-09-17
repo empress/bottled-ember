@@ -1,0 +1,148 @@
+#!/usr/bin/env node
+'use strict';
+
+const findCacheDir = require('find-cache-dir');
+const {
+  existsSync,
+  mkdirSync,
+  writeFileSync,
+  rmSync,
+  symlinkSync,
+  renameSync,
+  lstatSync,
+  rmdirSync,
+} = require('fs');
+const { join } = require('path');
+
+const argv = require('minimist')(process.argv.slice(2));
+
+const emberVersion = argv.emberVersion || '4.0';
+
+const cacheDir = findCacheDir({
+  name: `bottled-ember-${emberVersion}`.replace(/\./g, '-'),
+});
+
+async function run() {
+  const execa = (await import('execa')).execa;
+
+  if (!existsSync(cacheDir)) {
+    console.log('generating your bottled-ember app now 🤖');
+    mkdirSync(cacheDir, { recursive: true });
+
+    await execa('npm', ['-v']);
+
+    await execa(
+      'npx',
+      [`ember-cli@${emberVersion}`, 'init', '--skip-npm', '--no-welcome'],
+      {
+        cwd: cacheDir,
+      }
+    );
+    console.log(`bottled-ember app finished initialising 🤖`);
+
+    writeFileSync(join(cacheDir, '.npmrc'), 'auto-install-peers=true');
+
+    console.log('installing dependencies 🤖');
+
+    await execa('npx', ['pnpm', 'install'], {
+      cwd: cacheDir,
+    });
+
+    console.log('finished installing dependencies 🤖');
+    console.log('customising bottle-ember app 🤖');
+
+    await rmSync(join(cacheDir, 'app/templates/application.hbs'));
+
+    await renameSync(
+      join(cacheDir, 'config/environment.js'),
+      join(cacheDir, 'config/old-environment.js')
+    );
+
+    await writeFileSync(
+      join(cacheDir, 'config/environment.js'),
+      `const oldEnvironment = require('./old-environment');
+
+    module.exports = function(environment) {
+      const ENV = oldEnvironment(environment);
+
+      try {
+        const newEnvironment = require('${join(process.cwd(), 'config')}');
+
+        const newEnv = newEnvironment(environment);
+
+        return {
+          ...ENV,
+          ...newEnv,
+        }
+      } catch {
+        return ENV;
+      }
+    }`
+    );
+
+    console.log('installing linking your local app 🤖');
+
+    await execa('npx', ['pnpm', 'install', process.cwd()], {
+      cwd: cacheDir,
+    });
+
+    console.log('bottled-ember app successfully generated 🦾');
+  } else {
+    console.log('re-using existing bottled-ember app 🤖');
+  }
+
+  if (argv.deps) {
+    const deps = argv.deps.split(',');
+
+    const pkg = require(`${cacheDir}/package.json`);
+
+    if (!deps.every(dep => pkg.dependencies?.[dep])) {
+      console.log('installing your personal dependencies 🤖');
+      await execa('npx', ['pnpm', 'install', ...deps], {
+        cwd: cacheDir,
+      });
+
+      console.log('finished installing your personal dependencies 🤖');
+    } else {
+      console.log('keeping exising deps 🤖');
+    }
+  }
+
+  if (argv.links) {
+    const links = argv.links.split(',');
+
+    links.forEach((link) => {
+      if (existsSync(join(cacheDir, link))) {
+        const stats = lstatSync(join(cacheDir, link));
+        if (!stats.isSymbolicLink()) {
+          rmdirSync(join(cacheDir, link), {
+            recursive: true,
+            force: true,
+          });
+        }
+      }
+
+      if (!existsSync(join(cacheDir, link))) {
+        console.log(`linking ${link} 🤖`);
+        symlinkSync(join(process.cwd(), link), join(cacheDir, link));
+      }
+    });
+  }
+
+  await execa(
+    'npx',
+    [
+      'ember',
+      argv._[0] || 'serve',
+      '--output-path',
+      join(process.cwd(), 'dist'),
+    ],
+    {
+      cwd: cacheDir,
+      stderr: 'inherit',
+      stdout: 'inherit',
+    }
+  );
+}
+
+run();
