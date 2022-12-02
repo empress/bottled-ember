@@ -13,6 +13,7 @@ const {
   renameSync,
   lstatSync,
   rmdirSync,
+  readlinkSync,
 } = require('fs');
 const { join } = require('path');
 
@@ -173,19 +174,33 @@ async function run() {
     const links = argv.links.split(',');
 
     links.forEach((link) => {
-      if (existsSync(join(cacheDir, link))) {
-        const stats = lstatSync(join(cacheDir, link));
-        if (!stats.isSymbolicLink()) {
-          rmdirSync(join(cacheDir, link), {
+      let source, destination;
+
+      if (link.includes(':')) {
+        let split = link.split(':');
+        source = split[0];
+        destination = split[1];
+      } else {
+        source = destination = link;
+      }
+
+      const destiantionPath = join(cacheDir, destination);
+      const sourcePath = join(process.cwd(), source);
+
+      if (existsSync(destiantionPath)) {
+        const stats = lstatSync(destiantionPath);
+
+        if (!stats.isSymbolicLink() || readlinkSync(destiantionPath) !== sourcePath) {
+          rmdirSync(destiantionPath, {
             recursive: true,
             force: true,
           });
         }
       }
 
-      if (!existsSync(join(cacheDir, link))) {
-        console.log(`linking ${link} 🤖`);
-        symlinkSync(join(process.cwd(), link), join(cacheDir, link));
+      if (!existsSync(destiantionPath)) {
+        console.log(`linking ${source} -> ${destination} 🤖`);
+        symlinkSync(sourcePath, destiantionPath);
       }
     });
   }
