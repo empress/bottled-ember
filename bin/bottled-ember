@@ -124,11 +124,11 @@ async function run() {
       let trees = {};
 
       // todo make no-overlay work at runtime so you don't need to clear cache
-      if (${argv['no-overlay'] ? false : true} && existsSync(join('/Users/mansona/git/projects/bottled-ember/emberfest-fancy-button-addon', 'app'))) {
+      if (${argv['no-overlay'] ? false : true} && existsSync(join('${process.cwd()}', 'app'))) {
         trees.app = mergeTrees([join(__dirname, 'app'), join('${process.cwd()}', 'app')], { overwrite: true })
       }
 
-      if (${argv['no-overlay'] ? false : true} && existsSync(join('/Users/mansona/git/projects/bottled-ember/emberfest-fancy-button-addon', 'tests'))) {
+      if (${argv['no-overlay'] ? false : true} && existsSync(join('${process.cwd()}', 'tests'))) {
         trees.tests = mergeTrees([join(__dirname, 'tests'), join('${process.cwd()}', 'tests')], { overwrite: true })
       }
 
