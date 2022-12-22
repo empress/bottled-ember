@@ -10,6 +10,7 @@
   },
   "scripts": {},
   "dependencies": {
+    "cosmiconfig": "^8.0.0",
     "execa": "^6.1.0",
     "find-cache-dir": "^3.3.2",
     "minimist": "^1.2.6"

@@ -16,17 +16,28 @@ const {
   readlinkSync,
 } = require('fs');
 const { join } = require('path');
+const { cosmiconfig } = require('cosmiconfig');
+const explorer = cosmiconfig('bottled-ember');
+
+const DEFAULTS = {
+  emberVersion: '4.8',
+  cacheName: 'default',
+};
 
 const argv = minimist(process.argv.slice(2));
 
-const emberVersion = argv.emberVersion || '4.0';
-
-const cacheDir = findCacheDir({
-  name: `bottled-ember-${emberVersion.replace(/\./g, '-')}-${argv['cache-name'] ?? 'default'}`,
-});
-
 async function run() {
   const execa = (await import('execa')).execa;
+
+  const result = await explorer.search();
+  let options = {
+    ...DEFAULTS,
+    ...result?.config,
+  };
+
+  const pathSafeVersion = options.emberVersion.replace(/./g, '-');
+  const cacheName = `bottled-ember-${pathSafeVersion}-${options.cacheName}`;
+  const cacheDir = findCacheDir({ name: cacheName });
 
   if (!existsSync(cacheDir)) {
     console.log('generating your bottled-ember app now 🤖');
