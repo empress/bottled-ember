@@ -30,9 +30,15 @@ async function run() {
   const execa = (await import('execa')).execa;
 
   const result = await explorer.search();
+  let fromArgs = {}
+
+  if (argv.emberVersion) fromArgs.emberVersion = argv.emberVersion;
+  if (argv['cache-name']) fromArgs.cacheName = argv['cache-name'];
+
   let options = {
     ...DEFAULTS,
     ...result?.config,
+    ...fromArgs,
   };
 
   const pathSafeVersion = options.emberVersion.replace(/./g, '-');
