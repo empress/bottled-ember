@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
+const fse = require('fs-extra');
 const findCacheDir = require('find-cache-dir');
 const minimist = require('minimist');
 
@@ -72,32 +73,34 @@ async function run() {
 
     await rmSync(join(cacheDir, 'app/templates/application.hbs'));
 
-    await renameSync(
-      join(cacheDir, 'config/environment.js'),
-      join(cacheDir, 'config/old-environment.js')
-    );
+    if (await fse.pathExists(join(process.cwd(), 'config.js'))) {
+      await renameSync(
+        join(cacheDir, 'config/environment.js'),
+        join(cacheDir, 'config/old-environment.js')
+      );
 
-    await writeFileSync(
-      join(cacheDir, 'config/environment.js'),
-      `const oldEnvironment = require('./old-environment');
+      await writeFileSync(
+        join(cacheDir, 'config/environment.js'),
+        `const oldEnvironment = require('./old-environment');
 
-    module.exports = function(environment) {
-      const ENV = oldEnvironment(environment);
+      module.exports = function(environment) {
+        const ENV = oldEnvironment(environment);
 
-      try {
-        const newEnvironment = require('${join(process.cwd(), 'config')}');
+        try {
+          const newEnvironment = require('${join(process.cwd(), 'config')}');
 
-        const newEnv = newEnvironment(environment);
+          const newEnv = newEnvironment(environment);
 
-        return {
-          ...ENV,
-          ...newEnv,
+          return {
+            ...ENV,
+            ...newEnv,
+          }
+        } catch {
+          return ENV;
         }
-      } catch {
-        return ENV;
-      }
-    }`
-    );
+      }`
+      );
+    }
 
     await rmSync(join(cacheDir, 'ember-cli-build.js'));
 
