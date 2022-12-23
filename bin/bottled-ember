@@ -17,17 +17,49 @@ const {
   readlinkSync,
 } = require('fs');
 const { join } = require('path');
+const { cosmiconfig } = require('cosmiconfig');
+const explorer = cosmiconfig('bottled-ember');
+
+const DEFAULTS = {
+  emberVersion: '4.8',
+  cacheName: 'default',
+  deps: [],
+  links: [],
+  /**
+  * TODO: instead/and/or?, check for existence of matching folders?
+  */
+  noOverlay: false,
+  outputPath: null,
+  port: null,
+  environment: null,
+};
 
 const argv = minimist(process.argv.slice(2));
 
-const emberVersion = argv.emberVersion || '4.0';
-
-const cacheDir = findCacheDir({
-  name: `bottled-ember-${emberVersion.replace(/\./g, '-')}-${argv['cache-name'] ?? 'default'}`,
-});
-
 async function run() {
   const execa = (await import('execa')).execa;
+
+  const result = await explorer.search();
+  let fromArgs = {}
+
+  if (argv.emberVersion) fromArgs.emberVersion = argv.emberVersion;
+  if (argv.environment) fromArgs.environment = argv.environment;
+  if (argv['cache-name']) fromArgs.cacheName = argv['cache-name'];
+  if (argv['no-overlay']) fromArgs.noOverlay = argv['no-overlay'];
+  if (argv['output-path']) fromArgs.outputPath = argv['output-path'];
+  if (argv.p) fromArgs.port = argv.p;
+  if (argv.deps) fromArgs.deps = argv.deps.split(',');
+  if (argv.links) fromArgs.links = argv.links.split(',');
+
+  let options = {
+    ...DEFAULTS,
+    ...result?.config,
+    ...fromArgs,
+  };
+
+  const pathSafeVersion = options.emberVersion.replace(/./g, '-');
+  const cacheName = `bottled-ember-${pathSafeVersion}-${options.cacheName}`;
+  const cacheDir = findCacheDir({ name: cacheName });
 
   if (!existsSync(cacheDir)) {
     console.log('generating your bottled-ember app now 🤖');
@@ -127,11 +159,11 @@ async function run() {
       let trees = {};
 
       // todo make no-overlay work at runtime so you don't need to clear cache
-      if (${argv['no-overlay'] ? false : true} && existsSync(join('${process.cwd()}', 'app'))) {
+      if (${options.noOverlay ? false : true} && existsSync(join('${process.cwd()}', 'app'))) {
         trees.app = mergeTrees([join(__dirname, 'app'), join('${process.cwd()}', 'app')], { overwrite: true })
       }
 
-      if (${argv['no-overlay'] ? false : true} && existsSync(join('${process.cwd()}', 'tests'))) {
+      if (${options.noOverlay ? false : true} && existsSync(join('${process.cwd()}', 'tests'))) {
         trees.tests = mergeTrees([join(__dirname, 'tests'), join('${process.cwd()}', 'tests')], { overwrite: true })
       }
 
@@ -156,8 +188,8 @@ async function run() {
     console.log('re-using existing bottled-ember app 🤖');
   }
 
-  if (argv.deps) {
-    const deps = argv.deps.split(',');
+  if (options.deps?.length) {
+    const deps = options.deps;
 
     const pkg = require(`${cacheDir}/package.json`);
 
@@ -173,8 +205,8 @@ async function run() {
     }
   }
 
-  if (argv.links) {
-    const links = argv.links.split(',');
+  if (options.links?.length) {
+    const links = options.links;
 
     links.forEach((link) => {
       let source, destination;
@@ -210,18 +242,18 @@ async function run() {
 
   const commandArgs = ['ember', argv._[0] || 'serve'];
 
-  if (argv['output-path']) {
-    commandArgs.push('--output-path', join(process.cwd(), argv['output-path']));
+  if (options.outputPath) {
+    commandArgs.push('--output-path', join(process.cwd(), options.outputPath));
   } else {
     commandArgs.push('--output-path', join(process.cwd(), 'dist'));
   }
 
-  if (argv.p !== null && argv.p !== undefined) {
-    commandArgs.push(`--port=${argv.p}`);
+  if (options.port !== null && options.port !== undefined) {
+    commandArgs.push(`--port=${options.port}`);
   }
 
-  if (argv.environment) {
-    commandArgs.push('--environment', argv.environment);
+  if (options.environment) {
+    commandArgs.push('--environment', options.environment);
   }
 
   await execa(
