@@ -9,7 +9,7 @@ import { cosmiconfig } from 'cosmiconfig';
 const DEFAULTS = {
   emberVersion: '4.8',
   cacheName: 'default',
-  deps: [],
+  deps: {},
   links: [],
   /**
    * TODO: instead/and/or?, check for existence of matching folders?

@@ -5,7 +5,7 @@ export interface Options {
     */
   emberVersion: string;
   cacheName: string;
-  deps: string[];
+  deps: Record<string, string>;
   links: string[];
   noOverlay: boolean;
   /**
