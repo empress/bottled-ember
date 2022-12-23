@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-const findCacheDir = require('find-cache-dir');
 const minimist = require('minimist');
 
 const {
@@ -21,12 +20,13 @@ const argv = minimist(process.argv.slice(2));
 
 const emberVersion = argv.emberVersion || '4.0';
 
-const cacheDir = findCacheDir({
-  name: `bottled-ember-${emberVersion.replace(/\./g, '-')}-${argv['cache-name'] ?? 'default'}`,
-});
-
 async function run() {
   const execa = (await import('execa')).execa;
+  const findCacheDir = (await import('find-cache-dir')).default;
+
+  const cacheDir = findCacheDir({
+    name: `bottled-ember-${emberVersion.replace(/\./g, '-')}-${argv['cache-name'] ?? 'default'}`,
+  });
 
   if (!existsSync(cacheDir)) {
     console.log('generating your bottled-ember app now 🤖');
