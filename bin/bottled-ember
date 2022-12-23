@@ -1,8 +1,8 @@
 #!/usr/bin/env node
+// @ts-ignore
 'use strict';
 
 const fse = require('fs-extra');
-const findCacheDir = require('find-cache-dir');
 const minimist = require('minimist');
 
 const {
@@ -29,6 +29,7 @@ const DEFAULTS = {
   * TODO: instead/and/or?, check for existence of matching folders?
   */
   noOverlay: false,
+  staticTemplate: false,
   outputPath: null,
   port: null,
   environment: null,
@@ -38,6 +39,7 @@ const argv = minimist(process.argv.slice(2));
 
 async function run() {
   const execa = (await import('execa')).execa;
+  const findCacheDir = (await import('find-cache-dir')).default;
 
   const result = await explorer.search();
   let fromArgs = {}
@@ -265,6 +267,10 @@ async function run() {
       stdout: 'inherit',
     }
   );
+}
+
+function parseArgs() {
+
 }
 
 run();
