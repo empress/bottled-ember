@@ -1,119 +1,53 @@
 #!/usr/bin/env node
-// @ts-ignore
-'use strict';
+// @ts-check
 
-const fse = require('fs-extra');
-const minimist = require('minimist');
+import * as fsSync from 'node:fs';
+import * as path from 'node:path';
 
+import fse from 'fs-extra';
+import minimist from 'minimist';
+import { execa } from 'execa';
+
+import { resolveOptions } from './options.js';
+import { generateApp, getCacheDir, installDependencies } from './init.js';
+
+
+/**
+  * Local Alias:
+  * @typedef {import('./types').Options} Options
+  */
 const {
   existsSync,
-  mkdirSync,
-  writeFileSync,
   rmSync,
   symlinkSync,
-  renameSync,
   lstatSync,
   rmdirSync,
   readlinkSync,
 } = require('fs');
 const { join } = require('path');
-const { cosmiconfig } = require('cosmiconfig');
-const explorer = cosmiconfig('bottled-ember');
 
-const DEFAULTS = {
-  emberVersion: '4.8',
-  cacheName: 'default',
-  deps: [],
-  links: [],
-  /**
-  * TODO: instead/and/or?, check for existence of matching folders?
-  */
-  noOverlay: false,
-  staticTemplate: false,
-  outputPath: null,
-  port: null,
-  environment: null,
-};
 
 const argv = minimist(process.argv.slice(2));
 
 async function run() {
-  const execa = (await import('execa')).execa;
-  const findCacheDir = (await import('find-cache-dir')).default;
-
-  const result = await explorer.search();
-  let fromArgs = {}
-
-  if (argv.emberVersion) fromArgs.emberVersion = argv.emberVersion;
-  if (argv.environment) fromArgs.environment = argv.environment;
-  if (argv['cache-name']) fromArgs.cacheName = argv['cache-name'];
-  if (argv['no-overlay']) fromArgs.noOverlay = argv['no-overlay'];
-  if (argv['output-path']) fromArgs.outputPath = argv['output-path'];
-  if (argv.p) fromArgs.port = argv.p;
-  if (argv.deps) fromArgs.deps = argv.deps.split(',');
-  if (argv.links) fromArgs.links = argv.links.split(',');
-
-  let options = {
-    ...DEFAULTS,
-    ...result?.config,
-    ...fromArgs,
-  };
-
-  const pathSafeVersion = options.emberVersion.replace(/./g, '-');
-  const cacheName = `bottled-ember-${pathSafeVersion}-${options.cacheName}`;
-  const cacheDir = findCacheDir({ name: cacheName });
+  const options = await resolveOptions(argv);
+  const cacheDir = getCacheDir(options);
 
   if (!existsSync(cacheDir)) {
-    console.log('generating your bottled-ember app now 🤖');
-    mkdirSync(cacheDir, { recursive: true });
+    await generateApp(options, cacheDir);
+    await installDependencies(cacheDir);
 
-    await execa('npm', ['-v']);
-
-    // this prevents ember-cli from thinking it's already in an ember addon/app
-    // when running from the cache directory. Adding a package.json just short-circuits
-    // the mechanism that ember-cli uses to identify that it's already in an app/addon
-    writeFileSync(join(cacheDir, 'package.json'), '{}');
-
-    const initCommand = execa(
-      'npx',
-      [`ember-cli@${emberVersion}`, 'init', '--skip-npm', '--no-welcome'],
-      {
-        cwd: cacheDir,
-      }
-    );
-
-    initCommand.stdout.setEncoding('utf8');
-
-    initCommand.stdout.on("data", (data) => {
-      if(data.includes("Overwrite package.json?")) {
-        initCommand.stdin.write("y\n");
-      }
-    })
-
-    await initCommand;
-
-    console.log(`bottled-ember app finished initialising 🤖`);
-
-    writeFileSync(join(cacheDir, '.npmrc'), 'auto-install-peers=true');
-
-    console.log('installing dependencies 🤖');
-
-    await execa('npx', ['pnpm', 'install'], {
-      cwd: cacheDir,
-    });
-
-    console.log('finished installing dependencies 🤖');
     console.log('customising bottled-ember app 🤖');
 
-    await rmSync(join(cacheDir, 'app/templates/application.hbs'));
+    rmSync(join(cacheDir, 'app/templates/application.hbs'));
 
     if (await fse.pathExists(join(process.cwd(), 'config.js'))) {
-      await renameSync(
-        join(cacheDir, 'config/environment.js'),
-        join(cacheDir, 'config/old-environment.js')
+      fsSync.renameSync(
+        path.join(cacheDir, 'config/environment.js'),
+        path.join(cacheDir, 'config/old-environment.js')
       );
 
-      await writeFileSync(
+      fsSync.writeFileSync(
         join(cacheDir, 'config/environment.js'),
         `const oldEnvironment = require('./old-environment');
 
@@ -136,10 +70,10 @@ async function run() {
       );
     }
 
-    await rmSync(join(cacheDir, 'ember-cli-build.js'));
+    fsSync.rmSync(path.join(cacheDir, 'ember-cli-build.js'));
 
-    await writeFileSync(
-      join(cacheDir, 'ember-cli-build.js'),
+    fsSync.writeFileSync(
+      path.join(cacheDir, 'ember-cli-build.js'),
       `'use strict';
 
       const EmberApp = require('ember-cli/lib/broccoli/ember-app');
@@ -149,7 +83,7 @@ async function run() {
       let buildConfig = {}
 
       try {
-        const localConfig = require('${join(process.cwd(), 'config')}');
+        const localConfig = require('${path.join(process.cwd(), 'config')}');
 
         if (localConfig['ember-cli-build']) {
           buildConfig = localConfig['ember-cli-build'];
@@ -195,7 +129,7 @@ async function run() {
 
     const pkg = require(`${cacheDir}/package.json`);
 
-    if (!deps.every(dep => pkg.dependencies?.[dep])) {
+    if (!deps.every((dep) => pkg.dependencies?.[dep])) {
       console.log('installing your personal dependencies 🤖');
       await execa('npx', ['pnpm', 'install', ...deps], {
         cwd: cacheDir,
@@ -258,19 +192,11 @@ async function run() {
     commandArgs.push('--environment', options.environment);
   }
 
-  await execa(
-    'npx',
-    commandArgs,
-    {
-      cwd: cacheDir,
-      stderr: 'inherit',
-      stdout: 'inherit',
-    }
-  );
-}
-
-function parseArgs() {
-
+  await execa('npx', commandArgs, {
+    cwd: cacheDir,
+    stderr: 'inherit',
+    stdout: 'inherit',
+  });
 }
 
 run();
