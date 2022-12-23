@@ -32,7 +32,7 @@ async function run() {
     console.log('generating your bottled-ember app now 🤖');
     mkdirSync(cacheDir, { recursive: true });
 
-    await execa('npm', ['-v']);
+    await execa('pnpm', ['-v']);
 
     // this prevents ember-cli from thinking it's already in an ember addon/app
     // when running from the cache directory. Adding a package.json just short-circuits
