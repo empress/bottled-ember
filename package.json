@@ -11,21 +11,33 @@
   },
   "scripts": {
     "format:js": "prettier **/*.{js,cjs} -w",
-    "lint:js": "eslint ."
+    "lint:js": "eslint .",
+    "test": "vitest run --coverage"
   },
   "dependencies": {
     "cosmiconfig": "^8.0.0",
     "execa": "^6.1.0",
     "find-cache-dir": "^4.0.0",
     "fs-extra": "^11.1.0",
-    "minimist": "^1.2.6"
+    "minimist": "^1.2.6",
+    "vitest": "^0.26.2"
   },
   "engines": {
-    "node": "14.* || 16.* || >= 18"
+    "node": "^16.* || >= 18"
   },
   "devDependencies": {
     "@nullvoxpopuli/eslint-configs": "^2.3.5",
+    "@tsconfig/node-lts-strictest-esm": "^18.12.1",
+    "@vitest/coverage-c8": "^0.26.2",
     "eslint": "^8.30.0",
-    "prettier": "^2.8.1"
+    "prettier": "^2.8.1",
+    "typescript": "^4.9.4"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "ember-cli-htmlbars"
+      ]
+    }
   }
 }
