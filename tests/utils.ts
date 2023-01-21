@@ -31,10 +31,10 @@ export async function findFixtures(): Promise<string[]> {
     .map((stat) => stat.name);
 }
 
-export async function prepareFixture(name) {
+export async function prepareFixture(name: string) {
   let fixture = path.join(fixturesFolder, name);
 
-  console.info({ fixture });
+  console.info({ fixture, name });
   // error if doesn't exist
   // create tmp directory
   // copy to tmp directory
