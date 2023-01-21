@@ -20,7 +20,7 @@
     "dev": "NODE_OPTIONS='--no-warnings' ts-node ./dev/index.ts",
     "format:check": "prettier -c .",
     "format": "prettier -w .",
-    "lint:js": "eslint .",
+    "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run --coverage"
   },
