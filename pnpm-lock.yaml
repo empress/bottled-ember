@@ -6,6 +6,7 @@ specifiers:
   '@nullvoxpopuli/eslint-configs': ^3.0.4
   '@tsconfig/node-lts-strictest-esm': ^18.12.1
   '@types/node': ^18.11.18
+  '@types/yargs': ^17.0.20
   '@vitest/coverage-c8': ^0.27.3
   chalk: ^5.2.0
   cosmiconfig: ^8.0.0
@@ -36,6 +37,7 @@ devDependencies:
   '@nullvoxpopuli/eslint-configs': 3.0.4_3vccgihvamfrdnqonsut5ihh4a
   '@tsconfig/node-lts-strictest-esm': 18.12.1
   '@types/node': 18.11.18
+  '@types/yargs': 17.0.20
   '@vitest/coverage-c8': 0.27.3
   eslint: 8.32.0
   prettier: 2.8.3
@@ -1027,6 +1029,16 @@ packages:
 
   /@types/symlink-or-copy/1.2.0:
     resolution: {integrity: sha512-Lja2xYuuf2B3knEsga8ShbOdsfNOtzT73GyJmZyY7eGl2+ajOqrs8yM5ze0fsSoYwvA6bw7/Qr7OZ7PEEmYwWg==}
+    dev: true
+
+  /@types/yargs-parser/21.0.0:
+    resolution: {integrity: sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==}
+    dev: true
+
+  /@types/yargs/17.0.20:
+    resolution: {integrity: sha512-eknWrTHofQuPk2iuqDm1waA7V6xPlbgBoaaXEgYkClhLOnB0TtbW+srJaOToAgawPxPlHQzwypFA2bhZaUGP5A==}
+    dependencies:
+      '@types/yargs-parser': 21.0.0
     dev: true
 
   /@vitest/coverage-c8/0.27.3:

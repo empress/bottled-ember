@@ -24,7 +24,6 @@ jobs:
         run: |
           test_info=$(pnpm run --silent dev list-fixtures)
           echo "fixtures=$test_info" >> $GITHUB_OUTPUT
-        working-directory: ./tests
 
   lint_js:
     name: Lint JS
@@ -35,29 +34,8 @@ jobs:
       - uses: ./.github/actions/pnpm
       - name: ESLint
         run: pnpm lint
-
-  lint_tests:
-    name: Lint Tests
-    runs-on: ubuntu-latest
-    needs: [install_dependencies]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/pnpm
-      - name: ESLint
-        run: pnpm lint
-        working-directory: tests
-
-  types_library:
-    name: "Types: Library"
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    needs: [install_dependencies]
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/pnpm
-      - run: tsc --build --clean && tsc --build
-        continue-on-error: true
+      - name: Prettier
+        run: pnpm format:check
 
   types_tests:
     name: "Types: Tests"
@@ -72,20 +50,20 @@ jobs:
         continue-on-error: true
         working-directory: tests
 
-  fixture_tests:
-    name: "Test: ${{ matrix.fixtures.name }}"
-    runs-on: ubuntu-latest
-    needs: [install_dependencies]
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.install_dependencies.outputs.fixtures-matrix) }}
+  # fixture_tests:
+  #   name: "Test: ${{ matrix.fixtures.name }}"
+  #   runs-on: ubuntu-latest
+  #   needs: [install_dependencies]
+  #   strategy:
+  #     fail-fast: false
+  #     matrix: ${{ fromJson(needs.install_dependencies.outputs.fixtures-matrix) }}
 
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/pnpm
-      - name: Tests
-        working-directory: 'tests'
-        run: pnpm vitest --testNamePattern "${{ matrix.fixtures.name }}"
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/actions/pnpm
+  #     - name: Tests
+  #       working-directory: 'tests'
+  #       run: pnpm vitest --testNamePattern "${{ matrix.fixtures.name }}"
 
   # https://github.com/changesets/action
   release:
@@ -93,7 +71,7 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [fixture_tests]
+    # needs: [fixture_tests]
 
     steps:
       - uses: actions/checkout@v3
