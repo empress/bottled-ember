@@ -1,9 +1,9 @@
 // TODO: validate inputs?
 import { cosmiconfig } from 'cosmiconfig';
 /**
-  * Local Alias:
-  * @typedef {import('./types').Options} Options
-  */
+ * Local Alias:
+ * @typedef {import('./types').Options} Options
+ */
 
 /** @type { Options } */
 const DEFAULTS = {
@@ -22,13 +22,13 @@ const DEFAULTS = {
 };
 
 /**
-  * Merged version of all the Options prioritizing:
-  *  - Defaults
-  *  - Config overrides
-  *  - Args passed to the CLI override everything
-  *
-  * @return {Promise<Options>}
-  */
+ * Merged version of all the Options prioritizing:
+ *  - Defaults
+ *  - Config overrides
+ *  - Args passed to the CLI override everything
+ *
+ * @return {Promise<Options>}
+ */
 export async function resolveOptions(argv) {
   const explorer = cosmiconfig('buttered-ember');
   const fromArgs = parseArgs(argv);
@@ -42,10 +42,10 @@ export async function resolveOptions(argv) {
 }
 
 /**
-  * Normalize the args from argv to the shape of Options
-  *
-  * @return {Partial<Options>}
-  */
+ * Normalize the args from argv to the shape of Options
+ *
+ * @return {Partial<Options>}
+ */
 export function parseArgs(argv) {
   let fromArgs = {};
 
@@ -60,4 +60,3 @@ export function parseArgs(argv) {
 
   return fromArgs;
 }
-

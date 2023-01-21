@@ -4,9 +4,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 /**
-  * @param {Options} options
-  * @param {string} cacheDir
-  */
+ * @param {Options} options
+ * @param {string} cacheDir
+ */
 export async function generateApp(options, cacheDir) {
   console.log('generating your buttered-ember app now 🤖');
 
@@ -23,8 +23,8 @@ export async function generateApp(options, cacheDir) {
 }
 
 /**
-  * @param {string} cacheDir
-  */
+ * @param {string} cacheDir
+ */
 export async function installDependencies(cacheDir) {
   await fs.writeFile(path.join(cacheDir, '.npmrc'), 'auto-install-peers=true');
 
@@ -37,34 +37,33 @@ export async function installDependencies(cacheDir) {
   console.log('finished installing dependencies 🤖');
 }
 
-
 /**
-  * @param {Options} options
-  * @param {string} cacheDir
-  */
+ * @param {Options} options
+ * @param {string} cacheDir
+ */
 export async function init(options, cacheDir) {
-    const initCommand = execa(
-      'npx',
-      [`ember-cli@${options.emberVersion}`, 'init', '--skip-npm', '--no-welcome'],
-      {
-        cwd: cacheDir,
-      }
-    );
+  const initCommand = execa(
+    'npx',
+    [`ember-cli@${options.emberVersion}`, 'init', '--skip-npm', '--no-welcome'],
+    {
+      cwd: cacheDir,
+    }
+  );
 
-    initCommand.stdout.setEncoding('utf8');
+  initCommand.stdout.setEncoding('utf8');
 
-    initCommand.stdout.on('data', (data) => {
-      if (data.includes('Overwrite package.json?')) {
-        initCommand.stdin.write('y\n');
-      }
-    });
+  initCommand.stdout.on('data', (data) => {
+    if (data.includes('Overwrite package.json?')) {
+      initCommand.stdin.write('y\n');
+    }
+  });
 
-    await initCommand;
+  await initCommand;
 }
 
 /**
-  * @param {Options} options
-  */
+ * @param {Options} options
+ */
 export function getCacheDir(options) {
   const pathSafeVersion = options.emberVersion.replace(/./g, '-');
   const cacheName = `buttered-ember-${pathSafeVersion}-${options.cacheName}`;

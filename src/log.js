@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { stripIndent } from 'common-tags';
 
 /**
  * @param {string | Error} msg
@@ -10,7 +11,7 @@ export function error(msg) {
     }
   }
 
-  console.error(chalk.red((msg)));
+  console.error(chalk.red(stripIndent(msg)));
 }
 
 /**

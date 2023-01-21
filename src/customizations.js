@@ -1,27 +1,27 @@
 /**
-  * Local Alias:
-  * @typedef {import('./types').Options} Options
-  */
+ * Local Alias:
+ * @typedef {import('./types').Options} Options
+ */
 import fse from 'fs-extra';
 import * as fsSync from 'node:fs';
 import * as path from 'node:path';
 
 export async function applyDefaultCustomizations(options, cacheDir) {
-    if (await fse.pathExists(join(process.cwd(), 'config.js'))) {
-      fsSync.renameSync(
-        path.join(cacheDir, 'config/environment.js'),
-        path.join(cacheDir, 'config/old-environment.js')
-      );
+  if (await fse.pathExists(path.join(process.cwd(), 'config.js'))) {
+    fsSync.renameSync(
+      path.join(cacheDir, 'config/environment.js'),
+      path.join(cacheDir, 'config/old-environment.js')
+    );
 
-      fsSync.writeFileSync(
-        join(cacheDir, 'config/environment.js'),
-        `const oldEnvironment = require('./old-environment');
+    fsSync.writeFileSync(
+      path.join(cacheDir, 'config/environment.js'),
+      `const oldEnvironment = require('./old-environment');
 
       module.exports = function(environment) {
         const ENV = oldEnvironment(environment);
 
         try {
-          const newEnvironment = require('${join(process.cwd(), 'config')}');
+          const newEnvironment = require('${path.join(process.cwd(), 'config')}');
 
           const newEnv = newEnvironment(environment);
 
@@ -33,14 +33,14 @@ export async function applyDefaultCustomizations(options, cacheDir) {
           return ENV;
         }
       }`
-      );
-    }
+    );
+  }
 
-    fsSync.rmSync(path.join(cacheDir, 'ember-cli-build.js'));
+  fsSync.rmSync(path.join(cacheDir, 'ember-cli-build.js'));
 
-    fsSync.writeFileSync(
-      path.join(cacheDir, 'ember-cli-build.js'),
-      `'use strict';
+  fsSync.writeFileSync(
+    path.join(cacheDir, 'ember-cli-build.js'),
+    `'use strict';
 
       const EmberApp = require('ember-cli/lib/broccoli/ember-app');
       const mergeTrees = require('broccoli-merge-trees');
@@ -77,17 +77,19 @@ export async function applyDefaultCustomizations(options, cacheDir) {
         return app.toTree();
       };
       `
-    );
+  );
 }
 
 /**
-  * @param {Options} options
-  * @param {string} cacheDir
-  */
+ * @param {Options} options
+ * @param {string} cacheDir
+ */
 export async function applyTemplate(options, cacheDir) {
- let target;
+  let target;
 
- if (options.templateOverlay.startsWith('.')) {
+  if (options.templateOverlay.startsWith('.')) {
     // relative to options' directory?
- }
+  }
+
+  console.log({ target, cacheDir });
 }

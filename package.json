@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "chalk": "^5.2.0",
+    "common-tags": "^1.8.2",
     "cosmiconfig": "^8.0.0",
     "execa": "^6.1.0",
     "find-cache-dir": "^4.0.0",

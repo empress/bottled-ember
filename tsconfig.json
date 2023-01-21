@@ -3,8 +3,5 @@
     "esm": true
   },
   "extends": "@tsconfig/node-lts-strictest-esm/tsconfig.json",
-  "include": [
-    "bin/**/*",
-    "tests/**/*"
-  ]
+  "include": ["bin/**/*", "tests/**/*"]
 }

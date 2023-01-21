@@ -14,10 +14,8 @@ yargs(hideBin(process.argv))
     () => {},
     async () => {
       // let names = await findFixtures();
-
       // let fixtures = names.map((name) => ({ name }));
       // let output = JSON.stringify({ fixtures });
-
       // STDOUT is used to pipe to C.I. env vars
       // console.log(output);
     }
@@ -32,11 +30,8 @@ yargs(hideBin(process.argv))
     },
     async () => {
       // info('Coping fixture to tmp directory');
-
       // let project = await addonFrom(`${argv.name}`);
-
       // console.info(project.rootPath);
-
       // info('Done! ✨');
     }
   )
@@ -46,15 +41,12 @@ yargs(hideBin(process.argv))
     (yargs) => {
       return yargs.positional('sourceLocation', {
         type: 'string',
-        description:
-          'the source location of the fixture to copy. package.json is required',
+        description: 'the source location of the fixture to copy. package.json is required',
       });
     },
     async () => {
       // info('Coping fixture to tmp directory');
-
       // await adoptFixture(`${argv.sourceLocation}`);
-
       // info('Done! ✨');
     }
   )

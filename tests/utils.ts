@@ -8,10 +8,10 @@ const fixturesFolder = path.join(__dirname, 'fixtures');
 const binPath = path.join(__dirname, '../bin/buttered-ember.js');
 
 /**
-  * @typedef {{
-  *   cwd: string
-  * }} RunOptions;
-  */
+ * @typedef {{
+ *   cwd: string
+ * }} RunOptions;
+ */
 export function run({ cwd }) {
   return execa('node', [binPath], { cwd });
 }
@@ -19,6 +19,7 @@ export function run({ cwd }) {
 export async function prepareFixture(name) {
   let fixture = path.join(fixturesFolder, name);
 
+  console.info({ fixture });
   // error if doesn't exist
   // create tmp directory
   // copy to tmp directory

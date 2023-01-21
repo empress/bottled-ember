@@ -2,27 +2,18 @@
 // @ts-check
 
 import { execa } from 'execa';
+/**
+ * Local Alias:
+ * @typedef {import('./types').Options} Options
+ */
+import { existsSync, lstatSync, readlinkSync, rmdirSync, rmSync, symlinkSync } from 'fs';
+import { readJSONSync } from 'fs-extra';
 import minimist from 'minimist';
+import { join } from 'path';
 
-import { applyDefaultCustomizations, applyTemplate} from './customizations.js';
+import { applyDefaultCustomizations, applyTemplate } from './customizations.js';
 import { generateApp, getCacheDir, installDependencies } from './init.js';
 import { resolveOptions } from './options.js';
-
-
-/**
-  * Local Alias:
-  * @typedef {import('./types').Options} Options
-  */
-const {
-  existsSync,
-  rmSync,
-  symlinkSync,
-  lstatSync,
-  rmdirSync,
-  readlinkSync,
-} = require('fs');
-const { join } = require('path');
-
 
 const argv = minimist(process.argv.slice(2));
 
@@ -58,7 +49,7 @@ async function run() {
   if (options.deps?.length) {
     const deps = options.deps;
 
-    const pkg = require(`${cacheDir}/package.json`);
+    const pkg = readJSONSync(`${cacheDir}/package.json`);
 
     if (!deps.every((dep) => pkg.dependencies?.[dep])) {
       console.log('installing your personal dependencies 🤖');
