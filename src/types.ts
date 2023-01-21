@@ -1,7 +1,7 @@
 export interface Options {
   /**
     * Which ember-source and ember-cli version to use.
-    * These will always be in lock-step for bottled projects.
+    * These will always be in lock-step for buttered projects.
     */
   emberVersion: string;
   cacheName: string;
@@ -10,7 +10,7 @@ export interface Options {
   noOverlay: boolean;
   /**
     * Overlay the files at the template target on top of
-    * the bottled project. This can be useful for generating
+    * the buttered project. This can be useful for generating
     * projects with the same look and feel.
     *
     * example:

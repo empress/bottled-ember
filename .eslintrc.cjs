@@ -2,5 +2,5 @@
 
 const { configs } = require('@nullvoxpopuli/eslint-configs');
 
-// ESM is default, use configs.nodeCJS for CommonJS
-module.exports = configs.nodeTS();
+// The Node config does ESM, CJS, TS, etc
+module.exports = configs.node();

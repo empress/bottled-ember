@@ -1,12 +1,11 @@
-import * as url from 'node:url';
-import * as path from 'node:path';
-
 import { execa } from 'execa';
+import * as path from 'node:path';
+import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const fixturesFolder = path.join(__dirname, 'fixtures');
-const binPath = path.join(__dirname, '../bin/bottled-ember.js');
+const binPath = path.join(__dirname, '../bin/buttered-ember.js');
 
 /**
   * @typedef {{

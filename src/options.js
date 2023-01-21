@@ -30,9 +30,10 @@ const DEFAULTS = {
   * @return {Promise<Options>}
   */
 export async function resolveOptions(argv) {
-  const explorer = cosmiconfig('bottled-ember');
+  const explorer = cosmiconfig('buttered-ember');
   const fromArgs = parseArgs(argv);
   const result = await explorer.search();
+
   return {
     ...DEFAULTS,
     ...result?.config,

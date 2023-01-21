@@ -1,11 +1,10 @@
-import * as fsSync from 'node:fs';
-import * as path from 'node:path';
-
 /**
   * Local Alias:
   * @typedef {import('./types').Options} Options
   */
 import fse from 'fs-extra';
+import * as fsSync from 'node:fs';
+import * as path from 'node:path';
 
 export async function applyDefaultCustomizations(options, cacheDir) {
     if (await fse.pathExists(join(process.cwd(), 'config.js'))) {

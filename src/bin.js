@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // @ts-check
 
-import minimist from 'minimist';
 import { execa } from 'execa';
+import minimist from 'minimist';
 
-import { resolveOptions } from './options.js';
-import { generateApp, getCacheDir, installDependencies } from './init.js';
 import { applyDefaultCustomizations, applyTemplate} from './customizations.js';
+import { generateApp, getCacheDir, installDependencies } from './init.js';
+import { resolveOptions } from './options.js';
 
 
 /**
@@ -34,7 +34,7 @@ async function run() {
     await generateApp(options, cacheDir);
     await installDependencies(cacheDir);
 
-    console.log('customising bottled-ember app 🤖');
+    console.log('customising buttered-ember app 🤖');
 
     rmSync(join(cacheDir, 'app/templates/application.hbs'));
 
@@ -50,9 +50,9 @@ async function run() {
       cwd: cacheDir,
     });
 
-    console.log('bottled-ember app successfully generated 🦾');
+    console.log('buttered-ember app successfully generated 🦾');
   } else {
-    console.log('re-using existing bottled-ember app 🤖');
+    console.log('re-using existing buttered-ember app 🤖');
   }
 
   if (options.deps?.length) {
@@ -80,6 +80,7 @@ async function run() {
 
       if (link.includes(':')) {
         let split = link.split(':');
+
         source = split[0];
         destination = split[1];
       } else {

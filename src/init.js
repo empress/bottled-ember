@@ -1,15 +1,14 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-
 import { execa } from 'execa';
 import findCacheDir from 'find-cache-dir';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 /**
   * @param {Options} options
   * @param {string} cacheDir
   */
 export async function generateApp(options, cacheDir) {
-  console.log('generating your bottled-ember app now 🤖');
+  console.log('generating your buttered-ember app now 🤖');
 
   await fs.mkdir(cacheDir, { recursive: true });
 
@@ -20,7 +19,7 @@ export async function generateApp(options, cacheDir) {
 
   await init(options, cacheDir);
 
-  console.log(`bottled-ember app finished initialising 🤖`);
+  console.log(`buttered-ember app finished initialising 🤖`);
 }
 
 /**
@@ -68,7 +67,7 @@ export async function init(options, cacheDir) {
   */
 export function getCacheDir(options) {
   const pathSafeVersion = options.emberVersion.replace(/./g, '-');
-  const cacheName = `bottled-ember-${pathSafeVersion}-${options.cacheName}`;
+  const cacheName = `buttered-ember-${pathSafeVersion}-${options.cacheName}`;
   const cacheDir = findCacheDir({ name: cacheName });
 
   return cacheDir;
