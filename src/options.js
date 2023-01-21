@@ -7,7 +7,7 @@ import { cosmiconfig } from 'cosmiconfig';
 
 /** @type { Options } */
 const DEFAULTS = {
-  emberVersion: '4.8',
+  emberVersion: '4.10',
   cacheName: 'default',
   deps: {},
   links: [],
@@ -34,11 +34,15 @@ export async function resolveOptions(argv) {
   const fromArgs = parseArgs(argv);
   const result = await explorer.search();
 
-  return {
+  let result_final2 = {
     ...DEFAULTS,
     ...result?.config,
     ...fromArgs,
   };
+
+  let emberVersion = `${result_final2.emberVersion}`;
+
+  return { ...result_final2, emberVersion };
 }
 
 /**

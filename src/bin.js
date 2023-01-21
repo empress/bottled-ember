@@ -7,7 +7,7 @@ import { execa } from 'execa';
  * @typedef {import('./types').Options} Options
  */
 import { existsSync, lstatSync, readlinkSync, rmdirSync, rmSync, symlinkSync } from 'fs';
-import { readJSONSync } from 'fs-extra';
+import { readJsonSync } from 'fs-extra/esm';
 import minimist from 'minimist';
 import { join } from 'path';
 
@@ -49,7 +49,7 @@ async function run() {
   if (options.deps?.length) {
     const deps = options.deps;
 
-    const pkg = readJSONSync(`${cacheDir}/package.json`);
+    const pkg = readJsonSync(`${cacheDir}/package.json`);
 
     if (!deps.every((dep) => pkg.dependencies?.[dep])) {
       console.log('installing your personal dependencies 🤖');

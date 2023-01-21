@@ -2,6 +2,9 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    root: __dirname,
+    testTimeout: 380_000,
+    hookTimeout: 380_000,
     include: ['tetsts/**/*.mts', 'tests/*.mts'],
     // ...
   },

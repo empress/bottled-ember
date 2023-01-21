@@ -1,19 +1,34 @@
 import { execa } from 'execa';
-import * as path from 'node:path';
-import * as url from 'node:url';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import url from 'node:url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const fixturesFolder = path.join(__dirname, 'fixtures');
-const binPath = path.join(__dirname, '../bin/buttered-ember.js');
+const binPath = path.join(__dirname, '../src/bin.js');
 
-/**
- * @typedef {{
- *   cwd: string
- * }} RunOptions;
- */
-export function run({ cwd }) {
-  return execa('node', [binPath], { cwd });
+interface DirOrFixture {
+  cwd?: string;
+  onFixture?: string;
+}
+
+export function run({ cwd, onFixture }: DirOrFixture) {
+  if (onFixture) {
+    return execa('node', [binPath], { cwd: path.join(fixturesFolder, onFixture) });
+  }
+
+  if (cwd) {
+    return execa('node', [binPath], { cwd });
+  }
+
+  return { exitCode: 1 };
+}
+
+export async function findFixtures(): Promise<string[]> {
+  return (await fs.readdir(fixturesFolder, { withFileTypes: true }))
+    .filter((stat) => stat.isDirectory())
+    .map((stat) => stat.name);
 }
 
 export async function prepareFixture(name) {

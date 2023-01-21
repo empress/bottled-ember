@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { run } from './utils.js';
+import { findFixtures, run } from './utils.js';
+
+let fixtures = await findFixtures();
 
 describe('Overlaying a whole project', () => {
-  it('embroider-with-tests', () => {
-    console.info({ run });
-    expect(true).toBe(true);
-  });
+  for (let fixture of fixtures) {
+    it(fixture, async () => {
+
+      let { exitCode } = await run({ onFixture: fixture });
+
+      expect(exitCode).toBe(0);
+    });
+  }
 });
