@@ -51,20 +51,20 @@ jobs:
         working-directory: tests
 
   tests:
-    name: "Test: ${{ matrix.fixtures.name }}"
+    name: "Tests"
     runs-on: ubuntu-latest
     needs: [install_dependencies]
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/pnpm
       - name: Tests
-        run: pnpm vitest --coverage
+        run: pnpm vitest --config ./vitest.config.ts --coverage
 
 
   fixture_tests:
     name: "Test: ${{ matrix.fixtures.name }}"
     runs-on: ubuntu-latest
-    needs: [tests]
+    needs: [tests, install_dependencies]
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.install_dependencies.outputs.fixtures-matrix) }}
