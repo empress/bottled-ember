@@ -16,6 +16,7 @@
     "src"
   ],
   "scripts": {
+    "release": "changeset publish",
     "dev": "NODE_OPTIONS='--no-warnings' ts-node ./dev.ts",
     "format:check": "prettier -c .",
     "format": "prettier -w .",
@@ -37,6 +38,8 @@
     "node": "^16.* || >= 18"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/cli": "^2.26.0",
     "@nullvoxpopuli/eslint-configs": "^3.0.4",
     "@tsconfig/node-lts-strictest-esm": "^18.12.1",
     "@types/node": "^18.11.18",
