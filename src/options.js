@@ -16,9 +16,10 @@ const DEFAULTS = {
    */
   noOverlay: false,
   templateOverlay: '',
+  // Output / Running Options
   outputPath: null,
   port: null,
-  environment: null,
+  environment: 'development',
 };
 
 /**
