@@ -4,7 +4,6 @@ This is a fork of [bottled-ember][upstream], a CLI tool for bootstrapping ember 
 
 [upstream]: https://github.com/empress/bottled-ember
 
-
 ## Usage
 
 ```bash
@@ -21,10 +20,10 @@ npx buttered-ember ./docs
 ```
 
 Where `./docs` could be a collection of markdown files.
-Ember doesn't natively support markdown-to-html conversion, 
+Ember doesn't natively support markdown-to-html conversion,
 but other dependencies can handle this.
 
-To keep the management of "dependencies" minimal, 
+To keep the management of "dependencies" minimal,
 a configuration file may be defined,
 
 ```yaml
@@ -34,12 +33,13 @@ a configuration file may be defined,
 # could be any npm dependency
 # - this provides markdown to html conversion
 # - default routing, templates, etc
-template: "@my-scope/my-template"
-deps: 
-  "highlight.js": "^11.0.0"
+template: '@my-scope/my-template'
+deps:
+  'highlight.js': '^11.0.0'
 ```
 
 This uses [cosmiconfig][gh-cosmiconfig], so the following config formats are suppored:
+
 - "buttered-ember" entry in package.json
 - `.buttered-emberrc.json`
 - `.buttered-emberrc.yaml`
@@ -51,4 +51,3 @@ This uses [cosmiconfig][gh-cosmiconfig], so the following config formats are sup
 - `buttered-ember.config.cjs`
 
 [gh-cosmiconfig]: https://github.com/davidtheclark/cosmiconfig
-
