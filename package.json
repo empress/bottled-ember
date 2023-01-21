@@ -1,22 +1,63 @@
 {
-  "name": "bottled-ember",
-  "version": "0.5.0",
+  "name": "buttered-ember",
+  "version": "0.1.0",
   "description": "All the power of EmberJS, itty bitty living space",
-  "repository": "https://github.com/empress/bottled-ember",
+  "type": "module",
+  "repository": "https://github.com/NullVoxPopuli/buttered-ember",
   "license": "MIT",
-  "author": "Chris Manson <chris@manson.ie>",
+  "contributors": [
+    "nullvoxpopuli",
+    "Chris Manson <chris@manson.ie>"
+  ],
   "bin": {
-    "bottled-ember": "./bin/bottled-ember"
+    "buttered-ember": "./src/bin.js"
   },
-  "scripts": {},
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "release": "changeset publish",
+    "dev": "NODE_OPTIONS='--no-warnings' ts-node ./dev/index.ts",
+    "format:check": "prettier -c .",
+    "format": "prettier -w .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run --coverage"
+  },
   "dependencies": {
+    "chalk": "^5.2.0",
+    "common-tags": "^1.8.2",
     "cosmiconfig": "^8.0.0",
     "execa": "^6.1.0",
-    "find-cache-dir": "^3.3.2",
+    "find-cache-dir": "^4.0.0",
     "fs-extra": "^11.1.0",
-    "minimist": "^1.2.6"
+    "minimist": "^1.2.6",
+    "vitest": "^0.27.3",
+    "yargs": "^17.6.2"
   },
   "engines": {
-    "node": "14.* || 16.* || >= 18"
+    "node": "^16.* || >= 18"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/cli": "^2.26.0",
+    "@nullvoxpopuli/eslint-configs": "^3.0.4",
+    "@tsconfig/node-lts-strictest-esm": "^18.12.1",
+    "@types/node": "^18.11.18",
+    "@types/yargs": "^17.0.20",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "@vitest/coverage-c8": "^0.27.3",
+    "eslint": "^8.32.0",
+    "prettier": "^2.8.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "ember-cli-htmlbars"
+      ]
+    }
   }
 }
