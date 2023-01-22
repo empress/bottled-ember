@@ -2,17 +2,24 @@ import { describe, expect, it } from 'vitest';
 
 import { resolveOptions } from '../src/options.js';
 
+import type { Options } from '../src/types.js';
+
 describe('resloveOptions', () => {
   it('with no arguments', async () => {
-    let result = await resolveOptions({});
-
-    expect(result).toMatchObject({
+    const input: Options = {
       emberVersion: '4.10',
       deps: {},
       // Output / Running Options
       outputPath: null,
       port: null,
       environment: 'development',
-    });
+      cacheName: 'test',
+      localFiles: './',
+      templateOverlay: null,
+    };
+
+    let result = await resolveOptions(input);
+
+    expect(result).toMatchObject(input);
   });
 });

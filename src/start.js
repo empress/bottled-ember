@@ -14,7 +14,7 @@ import { generateApp, getCacheDir, installDependencies } from './init.js';
 import { resolveOptions } from './options.js';
 
 /**
- * @param {Options} args
+ * @param {any} args
  */
 export async function start(args) {
   const options = await resolveOptions(args);

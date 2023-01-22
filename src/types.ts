@@ -14,7 +14,7 @@ export interface Options {
    * example:
    *   templateOverlay: path.join(__dirname, 'app-template'),
    */
-  templateOverlay: string;
+  templateOverlay: string | null;
   outputPath: string | null;
   /**
    * Which port to run the ember server on
