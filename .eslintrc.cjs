@@ -7,13 +7,5 @@ const config = configs.node();
 
 module.exports = {
   ...config,
-  overrides: [
-    ...config.overrides,
-    {
-      files: ['**/*.js'],
-      rules: {
-        'no-console': 'off',
-      },
-    },
-  ],
+  overrides: [...config.overrides],
 };

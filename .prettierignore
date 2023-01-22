@@ -4,6 +4,7 @@ tmp/
 
 # test fixtures
 tests/fixtures/
+tests/fixture-support/
 
 # dependencies
 /node_modules/

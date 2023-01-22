@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@docfy/core": "^0.5.0",
+    "@docfy/ember": "^0.5.0"
+  }
+}
