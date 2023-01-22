@@ -5,13 +5,33 @@
  * @typedef {import('./types').Options} Options
  */
 
+import { packageJson } from 'ember-apply';
 import { execa } from 'execa';
 import { existsSync, rmSync } from 'fs';
+import { Listr } from 'listr2';
 import { join } from 'path';
 
 import { applyLayers } from './customizations.js';
 import { generateApp, getCacheDir, installDependencies } from './init.js';
 import { resolveOptions } from './options.js';
+
+/**
+ * Less stuff to install, the faster install happens.
+ * the linting and formatting stuff, in particular, has a lot of on-disk space.
+ */
+const DEFAULT_DEPS_TO_REMOVE = [
+  'eslint',
+  'eslint-config-prettier',
+  'eslint-plugin-ember',
+  'eslint-plugin-n',
+  'eslint-plugin-prettier',
+  'eslint-plugin-qunit',
+  'prettier',
+  'concurrently',
+  'babel-eslint',
+  'ember-fetch',
+  'ember-data',
+];
 
 /**
  * @param {any} args
@@ -20,28 +40,68 @@ export async function start(args) {
   const options = await resolveOptions(args);
   const cacheDir = getCacheDir(options);
 
-  if (!existsSync(cacheDir)) {
-    await generateApp(options, cacheDir);
-    await installDependencies(cacheDir);
+  let alreadyExists = existsSync(cacheDir);
 
-    console.log('customising buttered-ember app 🤖');
+  let tasks = new Listr(
+    [
+      {
+        title: 'Preparation',
+        task: async (_ctx, task) => {
+          let local = cacheDir.replace(process.env.HOME, '~');
 
-    rmSync(join(cacheDir, 'app/templates/application.hbs'));
+          task.output = `Buttered app in ${local}`;
+        },
+        options: {
+          persistentOutput: true,
+          bottomBar: true,
+        },
+      },
+      {
+        title: 'Building App',
+        task: async (ctx, task) => {
+          if (alreadyExists) {
+            task.title = 'App already built! 🎉';
+            task.skip();
 
-    await applyLayers(options, cacheDir);
+            return;
+          }
 
-    console.log('installing linking your local app 🤖');
+          return task.newListr(
+            [
+              {
+                title: 'Generating app',
+                task: () => generateApp(options, cacheDir),
+              },
+              {
+                title: 'Configuring dependencies',
+                task: () => modifyDependencies(options, cacheDir),
+              },
+              {
+                title: 'Installing dependencies',
+                task: () => installDependencies(cacheDir),
+              },
+              {
+                title: 'Linking current folder to the app',
+                task: () => link(cacheDir),
+              },
+              {
+                title: 'Applying customizations',
+                task: async () => {
+                  rmSync(join(cacheDir, 'app/templates/application.hbs'));
 
-    await execa('npx', ['pnpm', 'install', process.cwd()], {
-      cwd: cacheDir,
-    });
+                  await applyLayers(options, cacheDir);
+                },
+              },
+            ],
+            { concurrent: false }
+          );
+        },
+      },
+    ],
+    { concurrent: false }
+  );
 
-    console.log('buttered-ember app successfully generated 🦾');
-  } else {
-    console.log('re-using existing buttered-ember app 🤖');
-  }
-
-  await installCustomDeps(options, cacheDir);
+  await tasks.run();
 
   const commandArgs = ['ember-cli', 'serve'];
 
@@ -66,25 +126,42 @@ export async function start(args) {
 }
 
 /**
+ * @param {string} cacheDir
+ */
+async function link(cacheDir) {
+  await execa('npx', ['pnpm', 'install', process.cwd()], {
+    cwd: cacheDir,
+  });
+}
+
+/**
  * @param {Options} options
  * @param {string} cacheDir
  */
-async function installCustomDeps(options, cacheDir) {
-  if (options.deps?.length) {
-    let newDeps = [];
+async function modifyDependencies(options, cacheDir) {
+  await packageJson.modify((pJson) => {
+    let newDeps = options.dependencies || {};
+    let toRemove = [...DEFAULT_DEPS_TO_REMOVE, ...(options.removeDependencies || [])];
 
-    for (let [name, version] of Object.entries(options.deps)) {
-      newDeps.push(`${name}@${version}`);
+    if (pJson.devDependencies) {
+      for (let dep of toRemove) {
+        delete pJson.devDependencies[dep];
+      }
+
+      for (let dep of Object.keys(newDeps)) {
+        delete pJson.devDependencies[dep];
+      }
     }
 
-    console.log('installing your personal dependencies 🤖');
-
-    if (newDeps.length) {
-      await execa('npx', ['pnpm', 'add', ...newDeps], {
-        cwd: cacheDir,
-      });
+    if (pJson.dependencies) {
+      for (let dep of toRemove) {
+        delete pJson.devDependencies[dep];
+      }
     }
 
-    console.log('finished installing your personal dependencies 🤖');
-  }
+    pJson.dependencies = {
+      ...(pJson.dependencies || {}),
+      ...newDeps,
+    };
+  }, cacheDir);
 }

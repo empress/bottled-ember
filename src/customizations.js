@@ -12,9 +12,9 @@ import path from 'node:path';
  * @param {string} cacheDir
  */
 export async function applyLayers(options, cacheDir) {
-  if (options.templateOverlay.startsWith('.')) {
+  if (options.template?.startsWith('.')) {
     // relative to options' directory?
-    let absolute = path.join(process.cwd(), options.templateOverlay);
+    let absolute = path.join(process.cwd(), options.template);
 
     fse.copySync(absolute, cacheDir, { overwrite: true });
   }

@@ -35,9 +35,11 @@
     "chalk": "^5.2.0",
     "common-tags": "^1.8.2",
     "cosmiconfig": "^8.0.0",
+    "ember-apply": "^2.5.2",
     "execa": "^6.1.0",
     "find-cache-dir": "^4.0.0",
     "fs-extra": "^11.1.0",
+    "listr2": "^5.0.7",
     "minimist": "^1.2.6",
     "vitest": "^0.27.3",
     "yargs": "^17.6.2"

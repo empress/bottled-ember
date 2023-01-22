@@ -8,14 +8,14 @@ describe('resloveOptions', () => {
   it('with no arguments', async () => {
     const input: Options = {
       emberVersion: '4.10',
-      deps: {},
+      dependencies: {},
       // Output / Running Options
       outputPath: null,
       port: null,
       environment: 'development',
       cacheName: 'test',
       localFiles: './',
-      templateOverlay: null,
+      template: null,
     };
 
     let result = await resolveOptions(input);
