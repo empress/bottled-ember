@@ -16,7 +16,7 @@ import path from 'node:path';
  * Possible options:
  *   https://github.com/davidtheclark/cosmiconfig#searchplaces
  *
- * @param {Options} args
+ * @param {import('./types').Args} args
  * @return {Promise<Options>}
  */
 export async function resolveOptions(args) {
@@ -27,6 +27,7 @@ export async function resolveOptions(args) {
   const resultFinal2 = {
     ...result?.config,
     ...args,
+    projectRoot: path.join(process.cwd(), args.localFiles),
   };
 
   return resultFinal2;

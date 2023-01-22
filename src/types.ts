@@ -1,3 +1,23 @@
+export interface Args {
+  // Primary information
+  command: 'serve' | 'test' | 'build';
+  localFiles: string;
+
+  // Configuration overrides
+  cacheName?: string;
+  emberVersion: string;
+  name: string;
+  port?: number;
+
+  // Debug flags
+  force: boolean;
+  reLayer: boolean;
+
+  // Forwarded to ember-cli
+  environment: 'development' | 'production';
+  outputPath?: string;
+}
+
 export interface Options {
   /**
    * The name of your app.
@@ -8,6 +28,11 @@ export interface Options {
    * import { foo } from 'my-app';
    */
   name: string;
+
+  /**
+   * the absolute path of "localFiles"
+   */
+  projectRoot: string;
   /**
    * Command forwarded to ember-cli
    */

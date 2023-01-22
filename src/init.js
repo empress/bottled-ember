@@ -8,13 +8,9 @@ import path from 'node:path';
  * @param {string} cacheDir
  */
 export async function generateApp(options, cacheDir) {
-  console.log('generating your buttered-ember app now 🤖');
-
   await fs.mkdir(cacheDir, { recursive: true });
 
   await init(options, cacheDir);
-
-  console.log(`buttered-ember app finished initialising 🤖`);
 }
 
 /**
@@ -23,13 +19,9 @@ export async function generateApp(options, cacheDir) {
 export async function installDependencies(cacheDir) {
   await fs.writeFile(path.join(cacheDir, '.npmrc'), 'auto-install-peers=true');
 
-  console.log('installing dependencies 🤖');
-
   await execa('npx', ['pnpm', 'install'], {
     cwd: cacheDir,
   });
-
-  console.log('finished installing dependencies 🤖');
 }
 
 /**

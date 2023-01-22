@@ -61,6 +61,16 @@ yargs(hideBin(process.argv))
           'The environment to run the app in. This is passed to ember-cli as the EMBER_ENV environment variable.',
         default: 'development',
       });
+      yargs.option('force', {
+        type: 'boolean',
+        default: false,
+        description: 'A debugging flag used to ignore and clear cache before booting.',
+      });
+      yargs.option('re-layer', {
+        type: 'boolean',
+        default: false,
+        description: 'A debugging flag used to re-apply the layers on top of the base app.',
+      });
     },
     (args) => {
       return start(args);

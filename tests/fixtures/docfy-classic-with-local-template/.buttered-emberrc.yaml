@@ -1,0 +1,2 @@
+cacheName: 'test--docfy-with-template'
+template: "../../fixture-support/sample-docfy-template"

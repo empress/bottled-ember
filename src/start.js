@@ -9,9 +9,9 @@ import { packageJson } from 'ember-apply';
 import { execa } from 'execa';
 import { existsSync, rmSync } from 'fs';
 import { Listr } from 'listr2';
-import { join } from 'path';
+import path, { join } from 'path';
 
-import { applyLayers } from './customizations.js';
+import { applyLayers, dependenciesForTemplate } from './customizations.js';
 import { generateApp, getCacheDir, installDependencies } from './init.js';
 import { resolveOptions } from './options.js';
 
@@ -34,13 +34,11 @@ const DEFAULT_DEPS_TO_REMOVE = [
 ];
 
 /**
- * @param {any} args
+ * @param {import('./types').Args} args
  */
 export async function start(args) {
   const options = await resolveOptions(args);
   const cacheDir = getCacheDir(options);
-
-  let alreadyExists = existsSync(cacheDir);
 
   let tasks = new Listr(
     [
@@ -59,18 +57,36 @@ export async function start(args) {
       {
         title: 'Building App',
         task: async (ctx, task) => {
-          if (alreadyExists) {
-            task.title = 'App already built! 🎉';
-            task.skip();
+          let alreadyExists = existsSync(cacheDir);
 
-            return;
+          if (args.force) {
+            task.output = '--force detected. Clearing cache.';
+
+            rmSync(cacheDir, { recursive: true });
+          } else if (args.reLayer) {
+            task.output = '--re-layer detected.';
+          } else {
+            if (alreadyExists) {
+              task.title = 'App already built! 🎉';
+              task.skip();
+
+              return;
+            }
           }
 
           return task.newListr(
             [
               {
                 title: 'Generating app',
-                task: () => generateApp(options, cacheDir),
+                task: (_ctx, task) => {
+                  let alreadyGenerated = existsSync(path.join(cacheDir, 'app'));
+
+                  if (alreadyGenerated && args.reLayer) {
+                    task.skip();
+                  }
+
+                  return generateApp(options, cacheDir);
+                },
               },
               {
                 title: 'Configuring dependencies',
@@ -92,13 +108,13 @@ export async function start(args) {
                   await applyLayers(options, cacheDir);
                 },
               },
-            ],
-            { concurrent: false }
+            ]
+            // { concurrent: false }
           );
         },
       },
-    ],
-    { concurrent: false }
+    ]
+    // { concurrent: false }
   );
 
   await tasks.run();
@@ -139,6 +155,8 @@ export async function start(args) {
  * @param {string} cacheDir
  */
 async function modifyDependencies(options, cacheDir) {
+  let templateDeps = await dependenciesForTemplate(options);
+
   await packageJson.modify((pJson) => {
     let newDeps = options.dependencies || {};
     let toRemove = [...DEFAULT_DEPS_TO_REMOVE, ...(options.removeDependencies || [])];
@@ -161,6 +179,7 @@ async function modifyDependencies(options, cacheDir) {
 
     pJson.dependencies = {
       ...(pJson.dependencies || {}),
+      ...templateDeps,
       ...newDeps,
     };
   }, cacheDir);
