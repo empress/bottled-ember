@@ -34,7 +34,7 @@ a configuration file may be defined,
 # - this provides markdown to html conversion
 # - default routing, templates, etc
 template: '@my-scope/my-template'
-deps:
+dependencies:
   'highlight.js': '^11.0.0'
 ```
 
