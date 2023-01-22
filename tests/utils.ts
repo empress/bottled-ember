@@ -11,18 +11,22 @@ const binPath = path.join(__dirname, '../src/bin.js');
 interface DirOrFixture {
   cwd?: string;
   onFixture?: string;
+  cmd?: 'test' | 'serve';
 }
 
-export function run({ cwd, onFixture }: DirOrFixture) {
+export function run(cmd: 'test' | 'serve', { cwd, onFixture }: DirOrFixture) {
   if (onFixture) {
-    return execa('node', [binPath], { cwd: path.join(fixturesFolder, onFixture) });
+    return execa('node', [binPath, cmd], {
+      cwd: path.join(fixturesFolder, onFixture),
+      stdio: 'inherit',
+    });
   }
 
   if (cwd) {
-    return execa('node', [binPath], { cwd });
+    return execa('node', [binPath, cmd], { cwd });
   }
 
-  return { exitCode: 1 };
+  return { exitCode: 1, stderr: 'no fixture, nor cwd' };
 }
 
 export async function findFixtures(): Promise<string[]> {

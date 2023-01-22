@@ -10,12 +10,11 @@ const DEFAULT_EMBER_VERSION = '4.10.0';
 
 yargs(hideBin(process.argv))
   .command(
-    ['start', '$0 [cmd]'],
+    ['start [command]', '$0'],
     'bootstrap an ember app without any boilerplate',
     (yargs) => {
-      yargs.positional('cmd', {
+      yargs.positional('command', {
         type: 'string',
-        alias: 'c',
         description: 'Command to pass through to ember-cli',
         default: 'serve',
       });

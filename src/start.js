@@ -103,7 +103,7 @@ export async function start(args) {
 
   await tasks.run();
 
-  const commandArgs = ['ember-cli', 'serve'];
+  const commandArgs = ['ember-cli', options.command];
 
   if (options.outputPath) {
     commandArgs.push('--output-path', join(process.cwd(), options.outputPath));

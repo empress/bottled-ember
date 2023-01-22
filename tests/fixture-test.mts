@@ -7,7 +7,11 @@ let fixtures = await findFixtures();
 describe('Overlaying a whole project', () => {
   for (let fixture of fixtures) {
     it(fixture, async () => {
-      let { exitCode } = await run({ onFixture: fixture });
+      let { exitCode, stderr } = await run('test', { onFixture: fixture });
+
+      if (stderr) {
+        console.error(stderr);
+      }
 
       expect(exitCode).toBe(0);
     });

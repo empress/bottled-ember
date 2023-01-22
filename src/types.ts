@@ -9,6 +9,10 @@ export interface Options {
    */
   name: string;
   /**
+   * Command forwarded to ember-cli
+   */
+  command: string;
+  /**
    * Which ember-source and ember-cli version to use.
    * These will always be in lock-step for buttered projects.
    */
