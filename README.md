@@ -51,3 +51,31 @@ This uses [cosmiconfig][gh-cosmiconfig], so the following config formats are sup
 - `buttered-ember.config.cjs`
 
 [gh-cosmiconfig]: https://github.com/davidtheclark/cosmiconfig
+
+### Live-reload
+
+By default, the whole target directory will be watched for changes.
+If You need to work with the `app` or `tests` directories, those will
+also be wired up for you, but in the event you need a custom `ember-cli-build.js`,
+you can import a utility function and use the same watching logic:
+
+```js
+'use strict';
+
+const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const { watchTrees } = require('buttered-ember');
+
+module.exports = function (defaults) {
+  const app = new EmberApp(defaults);
+
+  const { Webpack } = require('@embroider/webpack');
+  return require('@embroider/compat').compatBuild(app, Webpack, {
+    extraPublicTrees: [watchTrees()],
+    staticAddonTestSupportTrees: true,
+    staticAddonTrees: true,
+    staticHelpers: true,
+    staticModifiers: true,
+    staticComponents: true,
+  });
+};
+```

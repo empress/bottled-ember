@@ -12,6 +12,11 @@
   "bin": {
     "buttered-ember": "./src/bin.js"
   },
+  "exports": {
+    ".": {
+      "require": "./src/broccoli.cjs"
+    }
+  },
   "files": [
     "src"
   ],
@@ -26,6 +31,7 @@
     "test": "vitest run --coverage"
   },
   "dependencies": {
+    "broccoli-merge-trees": "^4.2.0",
     "chalk": "^5.2.0",
     "common-tags": "^1.8.2",
     "cosmiconfig": "^8.0.0",

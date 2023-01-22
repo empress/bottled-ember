@@ -6,8 +6,6 @@ export interface Options {
   emberVersion: string;
   cacheName: string;
   deps: Record<string, string>;
-  links: string[];
-  noOverlay: boolean;
   /**
    * Overlay the files at the template target on top of
    * the buttered project. This can be useful for generating
@@ -26,4 +24,10 @@ export interface Options {
    * Which environment to start or build the project on
    */
   environment: 'development' | 'production';
+
+  /**
+   * Path to local files for the end user.
+   * These are applied *after* the template.
+   */
+  localFiles: string;
 }
