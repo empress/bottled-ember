@@ -1,60 +1,70 @@
 lockfileVersion: 5.4
 
-specifiers:
-  '@changesets/changelog-github': ^0.4.8
-  '@changesets/cli': ^2.26.0
-  '@nullvoxpopuli/eslint-configs': ^3.0.4
-  '@tsconfig/node-lts-strictest-esm': ^18.12.1
-  '@types/node': ^18.11.18
-  '@types/yargs': ^17.0.20
-  '@typescript-eslint/eslint-plugin': ^5.48.2
-  '@typescript-eslint/parser': ^5.48.2
-  '@vitest/coverage-c8': ^0.27.3
-  broccoli-merge-trees: ^4.2.0
-  chalk: ^5.2.0
-  common-tags: ^1.8.2
-  cosmiconfig: ^8.0.0
-  ember-apply: ^2.5.2
-  eslint: ^8.32.0
-  execa: ^6.1.0
-  find-cache-dir: ^4.0.0
-  fs-extra: ^11.1.0
-  listr2: ^5.0.7
-  minimist: ^1.2.6
-  prettier: ^2.8.3
-  ts-node: ^10.9.1
-  typescript: ^4.9.4
-  vitest: ^0.27.3
-  yargs: ^17.6.2
+importers:
 
-dependencies:
-  broccoli-merge-trees: 4.2.0
-  chalk: 5.2.0
-  common-tags: 1.8.2
-  cosmiconfig: 8.0.0
-  ember-apply: 2.5.2
-  execa: 6.1.0
-  find-cache-dir: 4.0.0
-  fs-extra: 11.1.0
-  listr2: 5.0.7
-  minimist: 1.2.7
-  vitest: 0.27.3
-  yargs: 17.6.2
+  .:
+    specifiers:
+      '@changesets/changelog-github': ^0.4.8
+      '@changesets/cli': ^2.26.0
+      '@nullvoxpopuli/eslint-configs': ^3.0.4
+      '@tsconfig/node-lts-strictest-esm': ^18.12.1
+      '@types/node': ^18.11.18
+      '@types/yargs': ^17.0.20
+      '@typescript-eslint/eslint-plugin': ^5.48.2
+      '@typescript-eslint/parser': ^5.48.2
+      '@vitest/coverage-c8': ^0.27.3
+      broccoli-merge-trees: ^4.2.0
+      chalk: ^5.2.0
+      common-tags: ^1.8.2
+      cosmiconfig: ^8.0.0
+      ember-apply: ^2.5.2
+      eslint: ^8.32.0
+      execa: ^6.1.0
+      find-cache-dir: ^4.0.0
+      fs-extra: ^11.1.0
+      listr2: ^5.0.7
+      minimist: ^1.2.6
+      prettier: ^2.8.3
+      ts-node: ^10.9.1
+      typescript: ^4.9.4
+      vitest: ^0.27.3
+      yargs: ^17.6.2
+    dependencies:
+      broccoli-merge-trees: 4.2.0
+      chalk: 5.2.0
+      common-tags: 1.8.2
+      cosmiconfig: 8.0.0
+      ember-apply: 2.5.2
+      execa: 6.1.0
+      find-cache-dir: 4.0.0
+      fs-extra: 11.1.0
+      listr2: 5.0.7
+      minimist: 1.2.7
+      vitest: 0.27.3
+      yargs: 17.6.2
+    devDependencies:
+      '@changesets/changelog-github': 0.4.8
+      '@changesets/cli': 2.26.0
+      '@nullvoxpopuli/eslint-configs': 3.0.4_tnhva45lcwaup2hl4dhmjgx35u
+      '@tsconfig/node-lts-strictest-esm': 18.12.1
+      '@types/node': 18.11.18
+      '@types/yargs': 17.0.20
+      '@typescript-eslint/eslint-plugin': 5.48.2_caon6io6stgpr7lz2rtbhekxqy
+      '@typescript-eslint/parser': 5.48.2_7uibuqfxkfaozanbtbziikiqje
+      '@vitest/coverage-c8': 0.27.3
+      eslint: 8.32.0
+      prettier: 2.8.3
+      ts-node: 10.9.1_awa2wsr5thmg3i7jqycphctjfq
+      typescript: 4.9.4
 
-devDependencies:
-  '@changesets/changelog-github': 0.4.8
-  '@changesets/cli': 2.26.0
-  '@nullvoxpopuli/eslint-configs': 3.0.4_tnhva45lcwaup2hl4dhmjgx35u
-  '@tsconfig/node-lts-strictest-esm': 18.12.1
-  '@types/node': 18.11.18
-  '@types/yargs': 17.0.20
-  '@typescript-eslint/eslint-plugin': 5.48.2_caon6io6stgpr7lz2rtbhekxqy
-  '@typescript-eslint/parser': 5.48.2_7uibuqfxkfaozanbtbziikiqje
-  '@vitest/coverage-c8': 0.27.3
-  eslint: 8.32.0
-  prettier: 2.8.3
-  ts-node: 10.9.1_awa2wsr5thmg3i7jqycphctjfq
-  typescript: 4.9.4
+  test-packages/docfy-template-provider:
+    specifiers: {}
+
+  tests/fixtures/docfy-classic-with-package-template:
+    specifiers:
+      '@nullvoxpopuli/docfy-template-provider': workspace:*
+    dependencies:
+      '@nullvoxpopuli/docfy-template-provider': link:../../../test-packages/docfy-template-provider
 
 packages:
 
