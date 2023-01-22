@@ -80,10 +80,10 @@ export async function start(args) {
                 title: 'Installing dependencies',
                 task: () => installDependencies(cacheDir),
               },
-              {
-                title: 'Linking current folder to the app',
-                task: () => link(cacheDir),
-              },
+              // {
+              //   title: 'Linking current folder to the app',
+              //   task: () => link(cacheDir),
+              // },
               {
                 title: 'Applying customizations',
                 task: async () => {
@@ -128,11 +128,11 @@ export async function start(args) {
 /**
  * @param {string} cacheDir
  */
-async function link(cacheDir) {
-  await execa('npx', ['pnpm', 'install', process.cwd()], {
-    cwd: cacheDir,
-  });
-}
+// async function link(cacheDir) {
+//   await execa('npx', ['pnpm', 'install', process.cwd()], {
+//     cwd: cacheDir,
+//   });
+// }
 
 /**
  * @param {Options} options
