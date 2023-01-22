@@ -111,7 +111,7 @@ export async function start(args) {
     commandArgs.push('--output-path', join(process.cwd(), 'dist'));
   }
 
-  if (options.port !== null && options.port !== undefined) {
+  if (options.port !== null && options.port !== undefined && options.command !== 'test') {
     commandArgs.push(`--port=${options.port}`);
   }
 
