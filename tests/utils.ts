@@ -1,25 +1,44 @@
 import { execa } from 'execa';
-import * as path from 'node:path';
-import * as url from 'node:url';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import url from 'node:url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const fixturesFolder = path.join(__dirname, 'fixtures');
-const binPath = path.join(__dirname, '../bin/buttered-ember.js');
+const binPath = path.join(__dirname, '../src/bin.js');
 
-/**
- * @typedef {{
- *   cwd: string
- * }} RunOptions;
- */
-export function run({ cwd }) {
-  return execa('node', [binPath], { cwd });
+interface DirOrFixture {
+  cwd?: string;
+  onFixture?: string;
+  cmd?: 'test' | 'serve';
 }
 
-export async function prepareFixture(name) {
+export function run(cmd: 'test' | 'serve', { cwd, onFixture }: DirOrFixture) {
+  if (onFixture) {
+    return execa('node', [binPath, cmd], {
+      cwd: path.join(fixturesFolder, onFixture),
+      stdio: 'inherit',
+    });
+  }
+
+  if (cwd) {
+    return execa('node', [binPath, cmd], { cwd });
+  }
+
+  return { exitCode: 1, stderr: 'no fixture, nor cwd' };
+}
+
+export async function findFixtures(): Promise<string[]> {
+  return (await fs.readdir(fixturesFolder, { withFileTypes: true }))
+    .filter((stat) => stat.isDirectory())
+    .map((stat) => stat.name);
+}
+
+export async function prepareFixture(name: string) {
   let fixture = path.join(fixturesFolder, name);
 
-  console.info({ fixture });
+  console.info({ fixture, name });
   // error if doesn't exist
   // create tmp directory
   // copy to tmp directory

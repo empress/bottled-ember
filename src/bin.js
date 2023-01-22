@@ -1,125 +1,69 @@
 #!/usr/bin/env node
 // @ts-check
 
-import { execa } from 'execa';
-/**
- * Local Alias:
- * @typedef {import('./types').Options} Options
- */
-import { existsSync, lstatSync, readlinkSync, rmdirSync, rmSync, symlinkSync } from 'fs';
-import { readJSONSync } from 'fs-extra';
-import minimist from 'minimist';
-import { join } from 'path';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
-import { applyDefaultCustomizations, applyTemplate } from './customizations.js';
-import { generateApp, getCacheDir, installDependencies } from './init.js';
-import { resolveOptions } from './options.js';
+import { start } from './start.js';
 
-const argv = minimist(process.argv.slice(2));
+const DEFAULT_EMBER_VERSION = '4.10.0';
 
-async function run() {
-  const options = await resolveOptions(argv);
-  const cacheDir = getCacheDir(options);
-
-  if (!existsSync(cacheDir)) {
-    await generateApp(options, cacheDir);
-    await installDependencies(cacheDir);
-
-    console.log('customising buttered-ember app 🤖');
-
-    rmSync(join(cacheDir, 'app/templates/application.hbs'));
-
-    if (options.templateOverlay) {
-      await applyTemplate(options, cacheDir);
-    } else {
-      await applyDefaultCustomizations(options, cacheDir);
-    }
-
-    console.log('installing linking your local app 🤖');
-
-    await execa('npx', ['pnpm', 'install', process.cwd()], {
-      cwd: cacheDir,
-    });
-
-    console.log('buttered-ember app successfully generated 🦾');
-  } else {
-    console.log('re-using existing buttered-ember app 🤖');
-  }
-
-  if (options.deps?.length) {
-    const deps = options.deps;
-
-    const pkg = readJSONSync(`${cacheDir}/package.json`);
-
-    if (!deps.every((dep) => pkg.dependencies?.[dep])) {
-      console.log('installing your personal dependencies 🤖');
-      await execa('npx', ['pnpm', 'install', ...deps], {
-        cwd: cacheDir,
+yargs(hideBin(process.argv))
+  .command(
+    ['start [command]', '$0'],
+    'bootstrap an ember app without any boilerplate',
+    (yargs) => {
+      yargs.positional('command', {
+        type: 'string',
+        description: 'Command to pass through to ember-cli',
+        default: 'serve',
       });
-
-      console.log('finished installing your personal dependencies 🤖');
-    } else {
-      console.log('keeping exising deps 🤖');
+      yargs.option('local-files', {
+        type: 'string',
+        alias: 'l',
+        description: 'The path to the local files to load in to the bootstrapped app.',
+        default: './',
+      });
+      yargs.option('port', {
+        type: 'number',
+        alias: 'p',
+        description: 'The port to run the app on',
+        default: '4200',
+      });
+      yargs.option('name', {
+        type: 'string',
+        alias: 'n',
+        description: 'The name of the app. This is the module that imports will come from.',
+        default: 'my-app',
+      });
+      yargs.option('emberVersion', {
+        type: 'string',
+        description: 'The version of ember-source and ember-cli to use.',
+        default: DEFAULT_EMBER_VERSION,
+      });
+      yargs.option('cacheName', {
+        type: 'string',
+        description:
+          `When working with multiple buttered ember apps, you may want to customize the cache name. ` +
+          `By default, this is chosen for you and is based off the folder path. ` +
+          `The folder path will be printed to stdout for debugging / inspecting if needed.`,
+      });
+      yargs.option('output-path', {
+        type: 'string',
+        alias: 'o',
+        description:
+          'The output directory to write the built app to. This may be useful for deploying the app to a CDN, for example.',
+      });
+      yargs.option('environment', {
+        type: 'string',
+        alias: ['e', 'env'],
+        description:
+          'The environment to run the app in. This is passed to ember-cli as the EMBER_ENV environment variable.',
+        default: 'development',
+      });
+    },
+    (args) => {
+      return start(args);
     }
-  }
-
-  if (options.links?.length) {
-    const links = options.links;
-
-    links.forEach((link) => {
-      let source, destination;
-
-      if (link.includes(':')) {
-        let split = link.split(':');
-
-        source = split[0];
-        destination = split[1];
-      } else {
-        source = destination = link;
-      }
-
-      const destiantionPath = join(cacheDir, destination);
-      const sourcePath = join(process.cwd(), source);
-
-      if (existsSync(destiantionPath)) {
-        const stats = lstatSync(destiantionPath);
-
-        if (!stats.isSymbolicLink() || readlinkSync(destiantionPath) !== sourcePath) {
-          rmdirSync(destiantionPath, {
-            recursive: true,
-            force: true,
-          });
-        }
-      }
-
-      if (!existsSync(destiantionPath)) {
-        console.log(`linking ${source} -> ${destination} 🤖`);
-        symlinkSync(sourcePath, destiantionPath);
-      }
-    });
-  }
-
-  const commandArgs = ['ember', argv._[0] || 'serve'];
-
-  if (options.outputPath) {
-    commandArgs.push('--output-path', join(process.cwd(), options.outputPath));
-  } else {
-    commandArgs.push('--output-path', join(process.cwd(), 'dist'));
-  }
-
-  if (options.port !== null && options.port !== undefined) {
-    commandArgs.push(`--port=${options.port}`);
-  }
-
-  if (options.environment) {
-    commandArgs.push('--environment', options.environment);
-  }
-
-  await execa('npx', commandArgs, {
-    cwd: cacheDir,
-    stderr: 'inherit',
-    stdout: 'inherit',
-  });
-}
-
-run();
+  )
+  .help().argv;

@@ -7,17 +7,20 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
+import { findFixtures } from '../tests/utils.js';
+
 yargs(hideBin(process.argv))
   .command(
     ['list-fixtures'],
     'lists the known fixtures -- for use for splitting C.I.',
     () => {},
     async () => {
-      // let names = await findFixtures();
-      // let fixtures = names.map((name) => ({ name }));
-      // let output = JSON.stringify({ fixtures });
+      let names = await findFixtures();
+      let fixtures = names.map((name) => ({ name }));
+      let output = JSON.stringify({ fixtures });
+
       // STDOUT is used to pipe to C.I. env vars
-      // console.log(output);
+      console.log(output);
     }
   )
   .command(
