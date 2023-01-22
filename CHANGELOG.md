@@ -1,5 +1,11 @@
 # buttered-ember
 
+## 0.1.2
+
+### Patch Changes
+
+- [#4](https://github.com/NullVoxPopuli/buttered-ember/pull/4) [`49a8ecb`](https://github.com/NullVoxPopuli/buttered-ember/commit/49a8ecbec326eae28e2652bef8cab8a511cdfa66) Thanks [@NullVoxPopuli](https://github.com/NullVoxPopuli)! - Local templates are now supported. See readme for details on templates.
+
 ## 0.1.1
 
 ### Patch Changes
