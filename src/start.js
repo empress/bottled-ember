@@ -13,7 +13,7 @@ import path, { join } from 'path';
 
 import { applyLayers, dependenciesForTemplate } from './customizations.js';
 import { generateApp, getCacheDir, installDependencies } from './init.js';
-import { resolveOptions } from './options.js';
+import { resolveOptions, verifyOptions } from './options.js';
 
 /**
  * Less stuff to install, the faster install happens.
@@ -45,6 +45,9 @@ export async function start(args) {
       {
         title: 'Preparation',
         task: async (_ctx, task) => {
+          task.output = `Verifying options...`;
+          await verifyOptions(options);
+
           let local = cacheDir.replace(process.env.HOME, '~');
 
           task.output = `Buttered app in ${local}`;
