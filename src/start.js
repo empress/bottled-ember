@@ -169,11 +169,7 @@ export async function start(args) {
  * @param {string} cacheDir
  */
 async function modifyDependencies(options, cacheDir) {
-  console.log('1 --------------')
-
   let templateDeps = await dependenciesForTemplate(options);
-
-  console.log('2 --------------')
 
   await packageJson.modify((pJson) => {
     let newDeps = options.dependencies || {};
