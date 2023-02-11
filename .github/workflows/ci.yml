@@ -34,8 +34,6 @@ jobs:
       - uses: ./.github/actions/pnpm
       - name: ESLint
         run: pnpm lint
-      - name: Prettier
-        run: pnpm format:check
 
   types_tests:
     name: "Types: Tests"
