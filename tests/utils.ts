@@ -20,7 +20,11 @@ const VERBOSE = yn((process.env as any).VERBOSE);
 export function run(cmd: 'test' | 'serve', { cwd, onFixture }: DirOrFixture) {
   if (onFixture) {
     if (VERBOSE) {
-      console.debug(`Running on fixture: \n\n` + `\tnode ${binPath} ${cmd}\n\n` + `In ${path.join(fixturesFolder, onFixture)}`);
+      console.debug(
+        `Running on fixture: \n\n` +
+          `\tnode ${binPath} ${cmd}\n\n` +
+          `In ${path.join(fixturesFolder, onFixture)}`
+      );
     }
 
     return execa('node', [binPath, cmd], {
