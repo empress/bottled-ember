@@ -8,6 +8,7 @@ importers:
       '@changesets/cli': ^2.26.0
       '@nullvoxpopuli/eslint-configs': ^3.1.1
       '@tsconfig/node-lts-strictest-esm': ^18.12.1
+      '@types/fs-extra': ^11.0.1
       '@types/node': ^18.13.0
       '@types/yargs': ^17.0.22
       '@typescript-eslint/eslint-plugin': ^5.51.0
@@ -49,6 +50,7 @@ importers:
       '@changesets/cli': 2.26.0
       '@nullvoxpopuli/eslint-configs': 3.1.1_zumkwusjuktau5fp6zzis3wilm
       '@tsconfig/node-lts-strictest-esm': 18.12.1
+      '@types/fs-extra': 11.0.1
       '@types/node': 18.13.0
       '@types/yargs': 17.0.22
       '@typescript-eslint/eslint-plugin': 5.51.0_z4swst3wuuqk4hlme4ajzslgh4
@@ -2121,6 +2123,13 @@ packages:
   /@types/chai/4.3.4:
     resolution: {integrity: sha512-KnRanxnpfpjUTqTCXslZSEdLfXExwgNxYPdiO2WGUj8+HDjFi8R3k5RVKPeSCzLjCcshCAtVO2QBbVuAV4kTnw==}
 
+  /@types/fs-extra/11.0.1:
+    resolution: {integrity: sha512-MxObHvNl4A69ofaTRU8DFqvgzzv8s9yRtaPPm5gud9HDNvpB3GPQFvNuTWAI59B9huVGV5jXYJwbCsmBsOGYWA==}
+    dependencies:
+      '@types/jsonfile': 6.1.1
+      '@types/node': 18.13.0
+    dev: true
+
   /@types/http-cache-semantics/4.0.1:
     resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==}
     dev: false
@@ -2141,6 +2150,12 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/jsonfile/6.1.1:
+    resolution: {integrity: sha512-GSgiRCVeapDN+3pqA35IkQwasaCh/0YFH5dEF6S88iDvEn901DjOeH3/QPY+XYP1DFzDZPvIvfeEgk+7br5png==}
+    dependencies:
+      '@types/node': 18.13.0
     dev: true
 
   /@types/minimatch/3.0.5:

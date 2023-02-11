@@ -6,7 +6,8 @@ import yn from 'yn';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-const fixturesFolder = path.join(__dirname, 'fixtures');
+export const fixturesFolder = path.join(__dirname, 'fixtures');
+
 const binPath = path.join(__dirname, '../src/bin.js');
 
 interface DirOrFixture {
