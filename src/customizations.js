@@ -116,7 +116,7 @@ export async function applyLayers(options, cacheDir) {
           }, cacheDir);
         }
 
-        await execa('pnpm', ['install'], { cwd: cacheDir });
+        await execa('pnpm', ['install', '--fix-lockfile'], { cwd: cacheDir });
       } catch (e) {
         // Mutating the Error message might be dangerous...
         //   🙃
