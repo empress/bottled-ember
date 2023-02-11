@@ -1,0 +1,6 @@
+{
+  "name": "@nullvoxpopuli/docfy-template-provider",
+  "version" : "0.0.1",
+  "main": "package.json",
+  "private": true
+}

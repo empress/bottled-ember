@@ -1,6 +1,6 @@
 import { execa } from 'execa';
-import findCacheDir from 'find-cache-dir';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 
 /**
@@ -53,7 +53,10 @@ export async function init(options, cacheDir) {
 export function getCacheDir(options) {
   const pathSafeVersion = options.emberVersion.replace(/\./g, '-');
   const cacheName = `buttered-ember-${pathSafeVersion}-${options.cacheName}`;
-  const cacheDir = findCacheDir({ name: cacheName });
+  // Local Cache (node_modudles/.cache) does not allow dependency installation
+  // const cacheDir = findCacheDir({ name: cacheName });
+  const tmpDir = os.tmpdir();
+  const cacheDir = path.join(tmpDir, cacheName);
 
   return cacheDir;
 }

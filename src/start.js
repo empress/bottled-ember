@@ -13,13 +13,15 @@ import path, { join } from 'path';
 
 import { applyLayers, dependenciesForTemplate } from './customizations.js';
 import { generateApp, getCacheDir, installDependencies } from './init.js';
-import { resolveOptions } from './options.js';
+import { resolveOptions, verifyOptions } from './options.js';
 
 /**
  * Less stuff to install, the faster install happens.
  * the linting and formatting stuff, in particular, has a lot of on-disk space.
  */
 const DEFAULT_DEPS_TO_REMOVE = [
+  'ember-cli-sri',
+  'ember-template-lint',
   'eslint',
   'eslint-config-prettier',
   'eslint-plugin-ember',
@@ -28,6 +30,10 @@ const DEFAULT_DEPS_TO_REMOVE = [
   'eslint-plugin-qunit',
   'prettier',
   'concurrently',
+  '@typescript-eslint/eslint-plugin',
+  '@typescript-eslint/parser',
+  '@babel/eslint-parser',
+  'ember-welcome-page',
   'babel-eslint',
   'ember-fetch',
   'ember-data',
@@ -45,6 +51,9 @@ export async function start(args) {
       {
         title: 'Preparation',
         task: async (_ctx, task) => {
+          task.output = `Verifying options...`;
+          await verifyOptions(options);
+
           let local = cacheDir.replace(process.env.HOME, '~');
 
           task.output = `Buttered app in ${local}`;
@@ -56,65 +65,67 @@ export async function start(args) {
       },
       {
         title: 'Building App',
+        options: {
+          persistentOutput: true,
+        },
         task: async (ctx, task) => {
-          let alreadyExists = existsSync(cacheDir);
-
           if (args.force) {
             task.output = '--force detected. Clearing cache.';
 
-            rmSync(cacheDir, { recursive: true });
+            rmSync(cacheDir, { recursive: true, force: true });
           } else if (args.reLayer) {
             task.output = '--re-layer detected.';
-          } else {
-            if (alreadyExists) {
-              task.title = 'App already built! 🎉';
-              task.skip();
-
-              return;
-            }
           }
+
+          // let alreadyGenerated = existsSync(path.join(cacheDir, 'app'));
+          // let shouldRelayer = args.reLayer || !alreadyGenerated;
+          let hasDependencies = existsSync(path.join(cacheDir, 'node_modudles'));
 
           return task.newListr(
             [
               {
                 title: 'Generating app',
-                task: (_ctx, task) => {
+                options: {
+                  persistentOutput: true,
+                },
+                task: async (_ctx, task) => {
                   let alreadyGenerated = existsSync(path.join(cacheDir, 'app'));
 
-                  if (alreadyGenerated && args.reLayer) {
-                    task.skip();
+                  if (alreadyGenerated) {
+                    task.output = 'App already built! 🎉';
+
+                    return;
                   }
 
-                  return generateApp(options, cacheDir);
+                  await generateApp(options, cacheDir);
                 },
               },
               {
                 title: 'Configuring dependencies',
+                skip: () => hasDependencies,
                 task: () => modifyDependencies(options, cacheDir),
               },
               {
                 title: 'Installing dependencies',
-                task: () => installDependencies(cacheDir),
+                skip: () => hasDependencies,
+                task: async () => installDependencies(cacheDir),
               },
-              // {
-              //   title: 'Linking current folder to the app',
-              //   task: () => link(cacheDir),
-              // },
               {
                 title: 'Applying customizations',
+                // skip: () => !shouldRelayer,
                 task: async () => {
-                  rmSync(join(cacheDir, 'app/templates/application.hbs'));
+                  rmSync(join(cacheDir, 'app/templates/application.hbs'), { force: true });
 
                   await applyLayers(options, cacheDir);
                 },
               },
-            ]
-            // { concurrent: false }
+            ],
+            { rendererOptions: { collapse: false } }
           );
         },
       },
-    ]
-    // { concurrent: false }
+    ],
+    { rendererOptions: { collapse: false } }
   );
 
   await tasks.run();

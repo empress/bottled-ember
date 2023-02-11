@@ -23,26 +23,30 @@
   "scripts": {
     "release": "changeset publish",
     "dev": "NODE_OPTIONS='--no-warnings' ts-node ./dev/index.ts",
-    "format:check": "prettier -c .",
-    "format": "prettier -w .",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "fix": "pnpm lint:fix && pnpm format",
-    "test": "vitest run --coverage"
+    "lint": "concurrently 'npm:lint:*(!fix)' --names 'lint:'",
+    "lint:fix": "concurrently 'npm:lint:*:fix' --names 'fix:'",
+    "lint:js": "eslint . --cache",
+    "lint:js:fix": "eslint . --fix",
+    "lint:prettier": "prettier -c .",
+    "lint:prettier:fix": "prettier -w .",
+    "test": "vitest run --coverage",
+    "test:slow": "vitest --config ./vitest.slow.config.ts "
   },
   "dependencies": {
     "broccoli-merge-trees": "^4.2.0",
     "chalk": "^5.2.0",
     "common-tags": "^1.8.2",
     "cosmiconfig": "^8.0.0",
-    "ember-apply": "^2.5.2",
+    "ember-apply": "^2.6.0",
     "execa": "^6.1.0",
     "find-cache-dir": "^4.0.0",
+    "find-up": "^6.3.0",
     "fs-extra": "^11.1.0",
     "listr2": "^5.0.7",
-    "minimist": "^1.2.6",
-    "vitest": "^0.27.3",
-    "yargs": "^17.6.2"
+    "minimist": "^1.2.8",
+    "vitest": "^0.28.4",
+    "yargs": "^17.6.2",
+    "yn": "^5.0.0"
   },
   "engines": {
     "node": "^16.* || >= 18"
@@ -50,17 +54,19 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.26.0",
-    "@nullvoxpopuli/eslint-configs": "^3.0.4",
+    "@nullvoxpopuli/eslint-configs": "^3.1.1",
     "@tsconfig/node-lts-strictest-esm": "^18.12.1",
-    "@types/node": "^18.11.18",
-    "@types/yargs": "^17.0.20",
-    "@typescript-eslint/eslint-plugin": "^5.48.2",
-    "@typescript-eslint/parser": "^5.48.2",
-    "@vitest/coverage-c8": "^0.27.3",
-    "eslint": "^8.32.0",
-    "prettier": "^2.8.3",
+    "@types/fs-extra": "^11.0.1",
+    "@types/node": "^18.13.0",
+    "@types/yargs": "^17.0.22",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "@vitest/coverage-c8": "^0.28.4",
+    "concurrently": "^7.6.0",
+    "eslint": "^8.34.0",
+    "prettier": "^2.8.4",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.5"
   },
   "pnpm": {
     "peerDependencyRules": {
