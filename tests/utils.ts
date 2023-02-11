@@ -2,6 +2,7 @@ import { execa } from 'execa';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import url from 'node:url';
+import yn from 'yn';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -14,9 +15,11 @@ interface DirOrFixture {
   cmd?: 'test' | 'serve';
 }
 
+const VERBOSE = yn((process.env as any).VERBOSE);
+
 export function run(cmd: 'test' | 'serve', { cwd, onFixture }: DirOrFixture) {
   if (onFixture) {
-    if (process.env.VERBOSE) {
+    if (VERBOSE) {
       console.debug(`Running on fixture: \n\n` + `\tnode ${binPath} ${cmd}\n\n` + `In ${path.join(fixturesFolder, onFixture)}`);
     }
 
@@ -27,7 +30,7 @@ export function run(cmd: 'test' | 'serve', { cwd, onFixture }: DirOrFixture) {
   }
 
   if (cwd) {
-    if (process.env.VERBOSE) {
+    if (VERBOSE) {
       console.debug(`Running in directory: \n\n` + `\tnode ${binPath} ${cmd}\n\n` + `In ${cwd}`);
     }
 
