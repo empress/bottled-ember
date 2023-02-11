@@ -72,7 +72,7 @@ export async function start(args) {
           if (args.force) {
             task.output = '--force detected. Clearing cache.';
 
-            rmSync(cacheDir, { recursive: true });
+            rmSync(cacheDir, { recursive: true, force: true });
           } else if (args.reLayer) {
             task.output = '--re-layer detected.';
           }
@@ -110,10 +110,6 @@ export async function start(args) {
                 skip: () => hasDependencies,
                 task: async () => installDependencies(cacheDir),
               },
-              // {
-              //   title: 'Linking current folder to the app',
-              //   task: () => link(cacheDir),
-              // },
               {
                 title: 'Applying customizations',
                 // skip: () => !shouldRelayer,
