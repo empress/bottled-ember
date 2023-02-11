@@ -1,5 +1,26 @@
 # buttered-ember
 
+## 0.2.0
+
+### Minor Changes
+
+- [#6](https://github.com/NullVoxPopuli/buttered-ember/pull/6) [`9b3856c`](https://github.com/NullVoxPopuli/buttered-ember/commit/9b3856c354f6d30406473253a79f5c86e545066f) Thanks [@NullVoxPopuli](https://github.com/NullVoxPopuli)! - Using templates with local directories as well as in-monorepo dependencies now in tested and works.
+
+  Support for using a template from a dependency is new though!
+
+  To use a template from a dependency, which may be addon,
+  add a `template` directory. This allows a template to exist within an existing addon without changing anything that would affect ember consumption of that addon.
+
+  Then, in the root of your buttered ember project, specify in your
+  `.buttered-emberrc.yaml` file (or any other compatible config name),
+  the name of the dependency to look for a `template` folder within.
+
+  ```yml
+  template: '@nullvoxpopuli/docfy-template-provider'
+  ```
+
+  Your `template` folder may contain a `package.json`, which then may add `dependencies` and `devDependencies` to the resulting buttered project.
+
 ## 0.1.2
 
 ### Patch Changes
