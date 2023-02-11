@@ -8,7 +8,11 @@ import { start } from './start.js';
 
 const DEFAULT_EMBER_VERSION = '4.10.0';
 
-yargs(hideBin(process.argv))
+let yarg = yargs(hideBin(process.argv));
+
+yarg.wrap(yarg.terminalWidth());
+
+yarg
   .command(
     ['start [command]', '$0'],
     'bootstrap an ember app without any boilerplate',
@@ -76,4 +80,4 @@ yargs(hideBin(process.argv))
       return start(args);
     }
   )
-  .help().argv;
+  .strict().argv;

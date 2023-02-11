@@ -1,10 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import { findFixtures, run } from './utils.js';
+import { clearCache, findFixtures, run } from './utils.js';
 
 let fixtures = await findFixtures();
 
 describe('Overlaying a whole project', () => {
+  beforeEach(async () => {
+    await clearCache();
+  });
+
   for (let fixture of fixtures) {
     it(fixture, async () => {
       let { exitCode, stderr } = await run('test', { onFixture: fixture });

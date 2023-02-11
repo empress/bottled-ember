@@ -120,3 +120,33 @@ module.exports = function (defaults) {
   });
 };
 ```
+
+## Contributing
+
+### Testing 
+
+The test suite is split in to two test projects, a "regular" one, and one with "slow" tests.
+
+These can each be ran via:
+```bash 
+pnpm test # regular tests
+pnpm test:slow # slow tests
+```
+
+The slow tests are more "end-to-end" focused, and run on full apps.
+When prefixing the test command with `VERBOSE=true`, 
+the command to run in what directory run in will be printed before the test runs.
+
+Example
+```
+VERBOSE=true pnpm test:slow
+
+
+Running on fixture: 
+
+	node <repo>/src/bin.js test
+
+In <repo>/tests/fixtures/docfy-classic-build
+```
+So for this test, we'd `cd` to `/tests/fixtures/docfy-classic-build` and run `node ../../../src/bin.js test` (or use the absolute path to the bin like the output says)
+

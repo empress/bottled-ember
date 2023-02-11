@@ -16,6 +16,10 @@ interface DirOrFixture {
 
 export function run(cmd: 'test' | 'serve', { cwd, onFixture }: DirOrFixture) {
   if (onFixture) {
+    if (process.env.VERBOSE) {
+      console.debug(`Running on fixture: \n\n` + `\tnode ${binPath} ${cmd}\n\n` + `In ${path.join(fixturesFolder, onFixture)}`);
+    }
+
     return execa('node', [binPath, cmd], {
       cwd: path.join(fixturesFolder, onFixture),
       stdio: 'inherit',
@@ -23,6 +27,10 @@ export function run(cmd: 'test' | 'serve', { cwd, onFixture }: DirOrFixture) {
   }
 
   if (cwd) {
+    if (process.env.VERBOSE) {
+      console.debug(`Running in directory: \n\n` + `\tnode ${binPath} ${cmd}\n\n` + `In ${cwd}`);
+    }
+
     return execa('node', [binPath, cmd], { cwd });
   }
 
@@ -43,4 +51,8 @@ export async function prepareFixture(name: string) {
   // create tmp directory
   // copy to tmp directory
   // return path to tmp directory
+}
+
+export async function clearCache() {
+  await fs.rm(path.join(__dirname, '../node_modules/.cache'), { recursive: true, force: true });
 }
