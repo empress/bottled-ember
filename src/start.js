@@ -77,8 +77,9 @@ export async function start(args) {
             task.output = '--re-layer detected.';
           }
 
-          let alreadyGenerated = existsSync(path.join(cacheDir, 'app'));
-          let shouldRelayer = args.reLayer && alreadyGenerated;
+          // let alreadyGenerated = existsSync(path.join(cacheDir, 'app'));
+          // let shouldRelayer = args.reLayer || !alreadyGenerated;
+          let hasDependencies = existsSync(path.join(cacheDir, 'node_modudles'));
 
           return task.newListr(
             [
@@ -101,12 +102,12 @@ export async function start(args) {
               },
               {
                 title: 'Configuring dependencies',
-                skip: () => !shouldRelayer,
+                skip: () => hasDependencies,
                 task: () => modifyDependencies(options, cacheDir),
               },
               {
                 title: 'Installing dependencies',
-                skip: () => !shouldRelayer,
+                skip: () => hasDependencies,
                 task: async () => installDependencies(cacheDir),
               },
               // {
@@ -115,7 +116,7 @@ export async function start(args) {
               // },
               {
                 title: 'Applying customizations',
-                skip: () => !shouldRelayer,
+                // skip: () => !shouldRelayer,
                 task: async () => {
                   rmSync(join(cacheDir, 'app/templates/application.hbs'), { force: true });
 

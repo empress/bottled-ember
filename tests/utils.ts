@@ -39,7 +39,7 @@ export function run(cmd: 'test' | 'serve', { cwd, onFixture }: DirOrFixture) {
       console.debug(`Running in directory: \n\n` + `\tnode ${binPath} ${cmd}\n\n` + `In ${cwd}`);
     }
 
-    return execa('node', [binPath, cmd], { cwd });
+    return execa('node', [binPath, cmd], { cwd, stdio: 'inherit' });
   }
 
   return { exitCode: 1, stderr: 'no fixture, nor cwd' };
