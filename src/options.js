@@ -29,7 +29,11 @@ export async function resolveOptions(args) {
   const result = await explorer.search(startIn);
 
   const resultFinal2 = {
-    cacheName: path.dirname(startIn),
+    cacheName: path
+      .dirname(startIn)
+      .replace(process.env.HOME, '_home_')
+      .replaceAll(path.sep, '_')
+      .replaceAll('~', '_home_'),
     ...result?.config,
     ...args,
     projectRoot: path.join(process.cwd(), args.localFiles),
