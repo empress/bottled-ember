@@ -1,7 +1,8 @@
-import { execa } from 'execa';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+
+import { execa } from 'execa';
 
 /**
  * @param {Options} options

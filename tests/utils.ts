@@ -1,7 +1,8 @@
-import { execa } from 'execa';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import url from 'node:url';
+
+import { execa } from 'execa';
 import yn from 'yn';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));

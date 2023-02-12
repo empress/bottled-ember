@@ -5,39 +5,15 @@
  * @typedef {import('./types').Options} Options
  */
 
-import { packageJson } from 'ember-apply';
 import { execa } from 'execa';
 import { existsSync, rmSync } from 'fs';
 import { Listr } from 'listr2';
 import path, { join } from 'path';
 
-import { applyLayers, dependenciesForTemplate } from './customizations.js';
+import { applyLayers } from './customizations.js';
+import { removeDefaults } from './dependencies.js';
 import { generateApp, getCacheDir, installDependencies } from './init.js';
 import { resolveOptions, verifyOptions } from './options.js';
-
-/**
- * Less stuff to install, the faster install happens.
- * the linting and formatting stuff, in particular, has a lot of on-disk space.
- */
-const DEFAULT_DEPS_TO_REMOVE = [
-  'ember-cli-sri',
-  'ember-template-lint',
-  'eslint',
-  'eslint-config-prettier',
-  'eslint-plugin-ember',
-  'eslint-plugin-n',
-  'eslint-plugin-prettier',
-  'eslint-plugin-qunit',
-  'prettier',
-  'concurrently',
-  '@typescript-eslint/eslint-plugin',
-  '@typescript-eslint/parser',
-  '@babel/eslint-parser',
-  'ember-welcome-page',
-  'babel-eslint',
-  'ember-fetch',
-  'ember-data',
-];
 
 /**
  * @param {import('./types').Args} args
@@ -103,7 +79,7 @@ export async function start(args) {
               {
                 title: 'Configuring dependencies',
                 skip: () => hasDependencies,
-                task: () => modifyDependencies(options, cacheDir),
+                task: () => removeDefaults(options, cacheDir),
               },
               {
                 title: 'Installing dependencies',
@@ -130,6 +106,14 @@ export async function start(args) {
 
   await tasks.run();
 
+  await runEmber(options, cacheDir);
+}
+
+/**
+ * @param {Options} options
+ * @param {string} cacheDir
+ */
+async function runEmber(options, cacheDir) {
   const commandArgs = ['ember-cli', options.command];
 
   if (options.outputPath) {
@@ -150,48 +134,4 @@ export async function start(args) {
     cwd: cacheDir,
     stdio: 'inherit',
   });
-}
-
-/**
- * @param {string} cacheDir
- */
-// async function link(cacheDir) {
-//   await execa('npx', ['pnpm', 'install', process.cwd()], {
-//     cwd: cacheDir,
-//   });
-// }
-
-/**
- * @param {Options} options
- * @param {string} cacheDir
- */
-async function modifyDependencies(options, cacheDir) {
-  let templateDeps = await dependenciesForTemplate(options);
-
-  await packageJson.modify((pJson) => {
-    let newDeps = options.dependencies || {};
-    let toRemove = [...DEFAULT_DEPS_TO_REMOVE, ...(options.removeDependencies || [])];
-
-    if (pJson.devDependencies) {
-      for (let dep of toRemove) {
-        delete pJson.devDependencies[dep];
-      }
-
-      for (let dep of Object.keys(newDeps)) {
-        delete pJson.devDependencies[dep];
-      }
-    }
-
-    if (pJson.dependencies) {
-      for (let dep of toRemove) {
-        delete pJson.devDependencies[dep];
-      }
-    }
-
-    pJson.dependencies = {
-      ...(pJson.dependencies || {}),
-      ...templateDeps,
-      ...newDeps,
-    };
-  }, cacheDir);
 }
