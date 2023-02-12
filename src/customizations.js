@@ -4,15 +4,15 @@
  * Local Alias:
  * @typedef {import('./types').Options} Options
  */
-import { packageJson } from 'ember-apply';
 import { execa } from 'execa';
 import { findUp } from 'find-up';
 import fse from 'fs-extra';
-import { pathExistsSync, readJsonSync } from 'fs-extra/esm';
 import assert from 'node:assert';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import yn from 'yn';
+
+import { mergePackageJson, modifyDependenciesFromOptions } from './dependencies.js';
 
 const require = createRequire(import.meta.url);
 const VERBOSE = yn(process.env.VERBOSE);
@@ -34,11 +34,16 @@ export async function applyLayers(options, cacheDir) {
   let localFiles = path.join(process.cwd(), options.localFiles);
 
   // Apply local files last
+  // these are allowed to overwrite anything the templates
+  // brought in
   await copy(cacheDir, localFiles);
 
   // Merge the local package.json, if it exists, because we want to be able
   // to override things that could be in a template package.json
   await mergePackageJson(cacheDir, localFiles);
+
+  // anything in the .buttered-emberrc file overrideds everything
+  await modifyDependenciesFromOptions(options, cacheDir);
 
   await execa('pnpm', ['install', '--fix-lockfile'], { cwd: cacheDir });
 }
@@ -59,6 +64,7 @@ async function applyLocalTemplate(cacheDir, options) {
   let absolute = path.join(options.projectRoot, options.template);
 
   await copy(cacheDir, absolute);
+  await mergePackageJson(cacheDir, absolute);
 }
 
 /**
@@ -142,61 +148,3 @@ async function copy(cacheDir, sourceDir) {
   });
 }
 
-/**
- * @param {string} cacheDir
- * @param {string} templatePath
- */
-async function mergePackageJson(cacheDir, templatePath) {
-  let partialPackageJsonPath = path.join(templatePath, 'package.json');
-
-  if (fse.existsSync(partialPackageJsonPath)) {
-    let toMerge = await packageJson.read(templatePath);
-
-    await packageJson.modify((json) => {
-      json.dependencies ||= {};
-      json.devDependencies ||= {};
-
-      for (let [dep, version] of Object.entries(toMerge.dependencies || {})) {
-        json.dependencies[dep] = version;
-      }
-
-      for (let [dep, version] of Object.entries(toMerge.devDependencies || {})) {
-        json.devDependencies[dep] = version;
-      }
-    }, cacheDir);
-  }
-}
-
-/**
- * @param {Options} options
- */
-export async function packageInfoForTemplate(options) {
-  if (options.template?.startsWith('.')) {
-    // relative to options' directory?
-    let absolute = path.join(options.projectRoot, options.template);
-    let pJson = path.join(absolute, 'package.json');
-
-    if (pathExistsSync(pJson)) {
-      return readJsonSync(pJson);
-    }
-  }
-
-  // TODO:
-  //   - download dep of the template
-  //   - extract the package.json from within the template folder
-  //     within the downloaded dep
-  // if (options.template) {
-  // }
-
-  return {};
-}
-
-/**
- * @param {Options} options
- */
-export async function dependenciesForTemplate(options) {
-  let pJson = await packageInfoForTemplate(options);
-  let deps = pJson.dependencies || {};
-
-  return deps;
-}
