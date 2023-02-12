@@ -113,7 +113,7 @@ export async function mergePackageJson(cacheDir, templatePath) {
 
 /**
  * We can't guarantee that version is going to be an actual SemVer version.
- * It could be a file:// or github:// protocol, which I think all package managers support.
+ * It could be a file: or github: protocol, which I think all package managers support.
  * Where we get in to trickyness is when packages exist in a monorepo, and don't have a way to
  * declare that they're in the monorepo.
  *
@@ -139,5 +139,5 @@ async function resolveVersion(dep, version, fromPath) {
 
   let depPath = path.dirname(depPackageJson);
 
-  return `workspace:${depPath}`;
+  return `file:${depPath}`;
 }

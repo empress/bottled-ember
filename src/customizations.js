@@ -26,13 +26,13 @@ const VERBOSE = yn(process.env.VERBOSE);
  * @param {string} cacheDir
  */
 export async function applyLayers(options, cacheDir) {
+  let localFiles = path.join(process.cwd(), options.localFiles);
+
   // If a template is a referencing a local directory, apply it
   await applyLocalTemplate(cacheDir, options);
 
   // If a dependency template is defined, apply it
   await applyDependencyTemplate(cacheDir, options);
-
-  let localFiles = path.join(process.cwd(), options.localFiles);
 
   // Apply local files last
   // these are allowed to overwrite anything the templates

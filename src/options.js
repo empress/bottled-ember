@@ -29,6 +29,7 @@ export async function resolveOptions(args) {
   const result = await explorer.search(startIn);
 
   const resultFinal2 = {
+    cacheName: path.dirname(startIn),
     ...result?.config,
     ...args,
     projectRoot: path.join(process.cwd(), args.localFiles),
