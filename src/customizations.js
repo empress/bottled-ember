@@ -4,12 +4,13 @@
  * Local Alias:
  * @typedef {import('./types').Options} Options
  */
-import { execa } from 'execa';
-import { findUp } from 'find-up';
-import fse from 'fs-extra';
 import assert from 'node:assert';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+
+import { execa } from 'execa';
+import { findUp } from 'find-up';
+import fse from 'fs-extra';
 import yn from 'yn';
 
 import { mergePackageJson, modifyDependenciesFromOptions } from './dependencies.js';
@@ -147,4 +148,3 @@ async function copy(cacheDir, sourceDir) {
     filter: (src) => !src.endsWith('package.json'),
   });
 }
-

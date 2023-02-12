@@ -5,13 +5,12 @@
  * @typedef {import('./types').Options} Options
  */
 
-import { packageJson } from 'ember-apply';
 import { execa } from 'execa';
 import { existsSync, rmSync } from 'fs';
 import { Listr } from 'listr2';
 import path, { join } from 'path';
 
-import { addDependenciesFromLocalTemplate, applyLayers, dependenciesForTemplate, modifyDependenciesFromOptions } from './customizations.js';
+import { applyLayers } from './customizations.js';
 import { removeDefaults } from './dependencies.js';
 import { generateApp, getCacheDir, installDependencies } from './init.js';
 import { resolveOptions, verifyOptions } from './options.js';
@@ -115,7 +114,6 @@ export async function start(args) {
  * @param {string} cacheDir
  */
 async function runEmber(options, cacheDir) {
-
   const commandArgs = ['ember-cli', options.command];
 
   if (options.outputPath) {

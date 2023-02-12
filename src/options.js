@@ -1,9 +1,10 @@
 // TODO: validate inputs?
-import { cosmiconfig } from 'cosmiconfig';
-import { readJsonSync } from 'fs-extra/esm';
 import assert from 'node:assert';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+
+import { cosmiconfig } from 'cosmiconfig';
+import { readJsonSync } from 'fs-extra/esm';
 /**
  * Local Alias:
  * @typedef {import('./types').Options} Options

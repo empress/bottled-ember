@@ -1,6 +1,12 @@
-import { packageJson } from "ember-apply";
-import fse from 'fs-extra'
+import assert from 'node:assert';
+import { createRequire } from 'node:module';
 import path from 'node:path';
+
+import { packageJson } from 'ember-apply';
+import { findUp } from 'find-up';
+import fse from 'fs-extra';
+
+const require = createRequire(import.meta.url);
 
 /**
  * Less stuff to install, the faster install happens.
@@ -25,7 +31,6 @@ const DEFAULT_DEPS_TO_REMOVE = [
   'ember-fetch',
   'ember-data',
 ];
-
 
 /**
  * @param {Options} options
@@ -81,7 +86,6 @@ export async function modifyDependenciesFromOptions(options, cacheDir) {
   }, cacheDir);
 }
 
-
 /**
  * @param {string} cacheDir
  * @param {string} templatePath
@@ -92,45 +96,48 @@ export async function mergePackageJson(cacheDir, templatePath) {
   if (fse.existsSync(partialPackageJsonPath)) {
     let toMerge = await packageJson.read(templatePath);
 
-  /**
-    * We can't guarantee that version is going to be an actual SemVer version.
-    * It could be a file:// or github:// protocol, which I think all package managers support.
-    * Where we get in to trickyness is when packages exist in a monorepo, and don't have a way to
-    * declare that they're in the monorepo.
-    *
-    * Thankfully, pnpm provides the "workspace protocol", for us to key off of.
-    * So, supporting in-monorepo linked dependencies here can only happen for pnpm
-    * monorepos.
-    *
-    * This is useful because in a buttered project,
-    * the user may want to link to an in-monorepo package that
-    * they want to test -- such as in qunit-assertions-extra
-    */
-    async function resolveVersion(dep, version) {
-      if (!version.startsWith('workspace:')) return version;
-
-      let depEntryPoint = require.resolve(dep, { paths: [templatePath] });
-      let depPackageJson = await findUp('package.json', { cwd: path.dirname(depEntryPoint)});
-
-      assert(depPackageJson, `Could not find package.json for ${dep}, specified at: ${templatePath}`);
-
-      let depPath = path.dirname(depPackageJson);
-
-      return `workspace:${depPath}`;
-    }
-
     await packageJson.modify(async (json) => {
       json.dependencies ||= {};
       json.devDependencies ||= {};
 
       for (let [dep, version] of Object.entries(toMerge.dependencies || {})) {
-        json.dependencies[dep] = await resolveVersion(version);
+        json.dependencies[dep] = await resolveVersion(dep, version, templatePath);
       }
 
       for (let [dep, version] of Object.entries(toMerge.devDependencies || {})) {
-        json.devDependencies[dep] = await resolveVersion(version);
+        json.devDependencies[dep] = await resolveVersion(dep, version, templatePath);
       }
     }, cacheDir);
   }
 }
 
+/**
+ * We can't guarantee that version is going to be an actual SemVer version.
+ * It could be a file:// or github:// protocol, which I think all package managers support.
+ * Where we get in to trickyness is when packages exist in a monorepo, and don't have a way to
+ * declare that they're in the monorepo.
+ *
+ * Thankfully, pnpm provides the "workspace protocol", for us to key off of.
+ * So, supporting in-monorepo linked dependencies here can only happen for pnpm
+ * monorepos.
+ *
+ * This is useful because in a buttered project,
+ * the user may want to link to an in-monorepo package that
+ * they want to test -- such as in qunit-assertions-extra
+ *
+ * @param {string} dep
+ * @param {string} version
+ * @param {string} fromPath
+ */
+async function resolveVersion(dep, version, fromPath) {
+  if (!version.startsWith('workspace:')) return version;
+
+  let depEntryPoint = require.resolve(dep, { paths: [fromPath] });
+  let depPackageJson = await findUp('package.json', { cwd: path.dirname(depEntryPoint) });
+
+  assert(depPackageJson, `Could not find package.json for ${dep}, specified at: ${fromPath}`);
+
+  let depPath = path.dirname(depPackageJson);
+
+  return `workspace:${depPath}`;
+}
