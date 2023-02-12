@@ -1,18 +1,24 @@
 #!/usr/bin/env node
 // @ts-check
 
+import { createRequire } from 'node:module';
+import path from 'node:path';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 import { start } from './start.js';
 
 const DEFAULT_EMBER_VERSION = '4.10.0';
+const require = createRequire(import.meta.url);
 
 let yarg = yargs(hideBin(process.argv));
 
 yarg.wrap(yarg.terminalWidth());
 
+let pkg = require(path.join('..', 'package.json'));
+
 yarg
+  .version(pkg.version)
   .command(
     ['start [command]', '$0'],
     'bootstrap an ember app without any boilerplate',
