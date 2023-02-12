@@ -1,5 +1,18 @@
 # buttered-ember
 
+## 0.3.0
+
+### Minor Changes
+
+- [#8](https://github.com/NullVoxPopuli/buttered-ember/pull/8) [`5bc6400`](https://github.com/NullVoxPopuli/buttered-ember/commit/5bc6400cdece6f193dde20d18646b3fbbc263e2b) Thanks [@NullVoxPopuli](https://github.com/NullVoxPopuli)! - Any time the package.json for the buttered app is modified,
+  we have a chance to unwravel the workspace protocol, if pnpm is used.
+  This is useful when a buttered app is used as a boilerplate-free test-app
+  and the package needing tests is in the same monorepo.
+
+  This is not possible to support with yarn or npm monorepos,
+  as they don't have any sort of workspace protocol -- a way to differentiate between
+  real published packages and packages in a monorepo
+
 ## 0.2.0
 
 ### Minor Changes
