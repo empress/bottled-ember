@@ -29,7 +29,7 @@ describe('Addon mode', () => {
     });
 
     it(`${fixture} try:one`, async () => {
-      let { stderr, stdout } = await run('try:one', {
+      let { exitCode, stderr, stdout } = await run('try:one', {
         onTestPackage: fixture,
         args: ['ember-4.8', '--addon'],
       });
@@ -38,6 +38,7 @@ describe('Addon mode', () => {
         console.error(stderr);
       }
 
+      expect(exitCode).toBe(0);
       expect(stdout).toContain('Scenario ember-4.8: SUCCESS');
     });
   }

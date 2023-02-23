@@ -1,6 +1,7 @@
 export interface Args {
   // Primary information
   command: 'serve' | 'test' | 'build';
+  commandOption?: string;
   localFiles: string;
   addon: boolean;
 
@@ -38,6 +39,7 @@ export interface Options {
    * Command forwarded to ember-cli
    */
   command: string;
+  commandOption?: string | null;
   /**
    * Turn on addon mode.
    * This will change the defaults,

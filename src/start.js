@@ -129,7 +129,11 @@ async function runEmber(options, cacheDir) {
   const commandArgs = ['ember-cli', options.command];
 
   if (options.command === 'try:each' || options.command === 'try:one') {
-    commandArgs.push('test');
+    if (options.commandOption) {
+      commandArgs.push(options.commandOption);
+    } else {
+      commandArgs.push('test');
+    }
 
     return await execa('npx', commandArgs, {
       cwd: cacheDir,
