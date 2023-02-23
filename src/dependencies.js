@@ -33,6 +33,19 @@ const DEFAULT_DEPS_TO_REMOVE = [
 ];
 
 /**
+ * @param {string} cacheDir
+ */
+export async function addAddonTestingDependencies(cachDir) {
+  await packageJson.modify(pJson => {
+    pJson.devDependencies ||= {};
+    pJson.devDependencies['@embroider/test-setup'] = '^2.0.0';
+    pJson.devDependencies['ember-source-channel-url'] = '^3.0.0';
+    pJson.devDependencies['ember-try'] = '^2.0.0';
+    pJson.devDependencies['ember-cli-deprecation-workflow'] = '^2.0.0';
+  }, cachDir);
+}
+
+/**
  * @param {Options} options
  * @param {string} cacheDir
  */

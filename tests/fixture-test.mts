@@ -1,17 +1,13 @@
 import path from 'node:path';
 
 import fse from 'fs-extra';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { clearCache, findFixtures, fixturesFolder, run } from './utils.js';
+import { findFixtures, fixturesFolder, run } from './utils.js';
 
 let fixtures = await findFixtures();
 
 describe('Overlaying a whole project', () => {
-  beforeEach(async () => {
-    await clearCache();
-  });
-
   for (let fixture of fixtures) {
     it(fixture, async () => {
       let { exitCode, stderr } = await run('test', { onFixture: fixture });

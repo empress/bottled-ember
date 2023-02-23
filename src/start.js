@@ -11,9 +11,11 @@ import { Listr } from 'listr2';
 import path, { join } from 'path';
 
 import { applyLayers } from './customizations.js';
-import { removeDefaults } from './dependencies.js';
+import { addAddonTestingDependencies, removeDefaults } from './dependencies.js';
 import { generateApp, getCacheDir, installDependencies } from './init.js';
 import { resolveOptions, verifyOptions } from './options.js';
+
+const HOME = process.env['HOME'] ?? '';
 
 /**
  * @param {import('./types').Args} args
@@ -30,7 +32,7 @@ export async function start(args) {
           task.output = `Verifying options...`;
           await verifyOptions(options);
 
-          let local = cacheDir.replace(process.env.HOME, '~');
+          let local = cacheDir.replace(HOME, '~');
 
           task.output = `Buttered app in ${local}`;
         },
@@ -79,7 +81,13 @@ export async function start(args) {
               {
                 title: 'Configuring dependencies',
                 skip: () => hasDependencies,
-                task: () => removeDefaults(options, cacheDir),
+                task: async () => {
+                  await removeDefaults(options, cacheDir);
+
+                  if (options.addon) {
+                    await addAddonTestingDependencies(cacheDir);
+                  }
+                }
               },
               {
                 title: 'Installing dependencies',
@@ -90,8 +98,6 @@ export async function start(args) {
                 title: 'Applying customizations',
                 // skip: () => !shouldRelayer,
                 task: async () => {
-                  rmSync(join(cacheDir, 'app/templates/application.hbs'), { force: true });
-
                   await applyLayers(options, cacheDir);
                 },
               },

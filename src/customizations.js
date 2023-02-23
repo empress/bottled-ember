@@ -5,6 +5,7 @@
  * @typedef {import('./types').Options} Options
  */
 import assert from 'node:assert';
+import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
@@ -14,6 +15,7 @@ import fse from 'fs-extra';
 import yn from 'yn';
 
 import { mergePackageJson, modifyDependenciesFromOptions } from './dependencies.js';
+import { writeTemplateFile } from './files.js';
 
 const require = createRequire(import.meta.url);
 const VERBOSE = yn(process.env.VERBOSE);
@@ -27,6 +29,9 @@ const VERBOSE = yn(process.env.VERBOSE);
  */
 export async function applyLayers(options, cacheDir) {
   let localFiles = path.join(process.cwd(), options.localFiles);
+
+  // Customizations on top of th default blueprint
+  await applyBaseOverrides(options, cacheDir);
 
   // If a template is a referencing a local directory, apply it
   await applyLocalTemplate(cacheDir, options);
@@ -47,6 +52,22 @@ export async function applyLayers(options, cacheDir) {
   await modifyDependenciesFromOptions(options, cacheDir);
 
   await execa('pnpm', ['install', '--fix-lockfile'], { cwd: cacheDir });
+}
+
+/**
+ * @param {Options} options
+ * @param {string} cacheDir
+ */
+async function applyBaseOverrides(options, cacheDir) {
+  await fs.rm(path.join(cacheDir, 'app/templates/application.hbs'), { force: true });
+
+  if (options.addon) {
+    let config = path.join(cacheDir, 'config');
+
+    await writeTemplateFile('addon/ember-try.js', config);
+    await writeTemplateFile('addon/ember-cli-build.js', cacheDir);
+    await writeTemplateFile('addon/deprecation-workflow.js', config);
+  }
 }
 
 /**

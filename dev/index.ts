@@ -7,7 +7,7 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-import { findFixtures } from '../tests/utils.js';
+import { findEmberTry, findFixtures } from '../tests/utils.js';
 
 yargs(hideBin(process.argv))
   .command(
@@ -15,8 +15,9 @@ yargs(hideBin(process.argv))
     'lists the known fixtures -- for use for splitting C.I.',
     () => {},
     async () => {
-      let names = await findFixtures();
-      let fixtures = names.map((name) => ({ name }));
+      let fixtureNames = await findFixtures();
+      let emberTryNames = await findEmberTry();
+      let fixtures = [...fixtureNames, ...emberTryNames].map((name) => ({ name }));
       let output = JSON.stringify({ fixtures });
 
       // STDOUT is used to pipe to C.I. env vars

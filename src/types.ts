@@ -2,6 +2,7 @@ export interface Args {
   // Primary information
   command: 'serve' | 'test' | 'build';
   localFiles: string;
+  addon: boolean;
 
   // Configuration overrides
   cacheName?: string;
@@ -37,6 +38,13 @@ export interface Options {
    * Command forwarded to ember-cli
    */
   command: string;
+  /**
+    * Turn on addon mode.
+    * This will change the defaults,
+    *  - ember-try is present,
+    *  - ember-cli-build.js uses maybeEmbroider from @embroider/test-setup
+    */
+  addon: boolean;
   /**
    * Which ember-source and ember-cli version to use.
    * These will always be in lock-step for buttered projects.

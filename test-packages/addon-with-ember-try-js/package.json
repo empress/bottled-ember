@@ -1,0 +1,40 @@
+{
+  "name": "@nullvoxpopuli/addon-with-ember-try-js",
+  "version": "0.0.0",
+  "description": "The default blueprint for ember-cli addons.",
+  "keywords": [
+    "ember-addon"
+  ],
+  "repository": "",
+  "license": "MIT",
+  "author": "",
+  "files": [
+    "addon-main.cjs",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup --config",
+    "start": "rollup --config --watch",
+    "test": "node ../buttered-ember/src/bin.js test",
+    "try": "node ../buttered-ember/src/bin.js try:one --addon",
+    "prepack": "pnpm run build",
+    "prepare": "pnpm run build"
+  },
+  "dependencies": {
+    "@embroider/addon-shim": "^1.0.0"
+  },
+  "ember": {
+    "edition": "octane"
+  },
+  "ember-addon": {
+    "version": 2,
+    "type": "addon",
+    "main": "addon-main.cjs",
+    "app-js": {}
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./*": "./src/*.js",
+    "./addon-main.js": "./addon-main.cjs"
+  }
+}
