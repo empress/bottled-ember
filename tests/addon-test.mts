@@ -6,7 +6,7 @@ let fixtures = await findEmberTry();
 
 describe('Addon mode', () => {
   for (let fixture of fixtures) {
-    it(fixture, async () => {
+    it(`${fixture} try:each`, async () => {
       let { stderr, stdout } = await run('try:each', {
         onTestPackage: fixture,
         args: ['--addon'],
@@ -26,6 +26,19 @@ describe('Addon mode', () => {
       expect(stdout).toContain('Scenario ember-release + embroider-safe: SUCCESS');
       expect(stdout).toContain('Scenario ember-release + embroider-optimized: SUCCESS');
       expect(stdout).toContain('Scenario ember-lts-4.8 + embroider-optimized: SUCCESS');
+    });
+
+    it(`${fixture} try:one`, async () => {
+      let { stderr, stdout } = await run('try:one', {
+        onTestPackage: fixture,
+        args: ['ember-4.8', '--addon'],
+      });
+
+      if (stderr) {
+        console.error(stderr);
+      }
+
+      expect(stdout).toContain('Scenario ember-4.8: SUCCESS');
     });
   }
 });
