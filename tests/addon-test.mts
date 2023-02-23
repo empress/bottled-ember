@@ -12,6 +12,8 @@ describe('Addon mode', () => {
         args: ['--addon', '--cacheName', 'try-each'],
       });
 
+      stdout ||= (stderr as any).stdout;
+
       if (stderr) {
         console.error(stderr);
       }
@@ -29,10 +31,12 @@ describe('Addon mode', () => {
     });
 
     it(`${fixture} try:one`, async () => {
-      let { exitCode, stderr, stdout } = await run('try:one', {
+      let result = await run('try:one', {
         onTestPackage: fixture,
         args: ['ember-4.8', '--addon', '--cacheName', 'try-one'],
       });
+
+      let { exitCode, stderr, stdout } = result;
 
       if (stderr) {
         console.error(stderr);
