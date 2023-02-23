@@ -9,7 +9,7 @@ describe('Addon mode', () => {
     it(`${fixture} try:each`, async () => {
       let { stderr, stdout } = await run('try:each', {
         onTestPackage: fixture,
-        args: ['--addon'],
+        args: ['--addon', '--cacheName', 'try-each'],
       });
 
       if (stderr) {
@@ -31,7 +31,7 @@ describe('Addon mode', () => {
     it(`${fixture} try:one`, async () => {
       let { exitCode, stderr, stdout } = await run('try:one', {
         onTestPackage: fixture,
-        args: ['ember-4.8', '--addon'],
+        args: ['ember-4.8', '--addon', '--cacheName', 'try-one'],
       });
 
       if (stderr) {

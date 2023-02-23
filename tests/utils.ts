@@ -6,6 +6,8 @@ import url from 'node:url';
 import { execa } from 'execa';
 import yn from 'yn';
 
+import type { ExecaChildProcess } from 'execa';
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export const fixturesFolder = path.join(__dirname, 'fixtures');
@@ -40,10 +42,12 @@ export async function run(
       );
     }
 
-    return execa('node', [binPath, cmd, ...(args || [])], {
-      cwd: path.join(testPackagesFolder, onTestPackage),
-      stdio: 'inherit',
-    });
+    return noException(
+      execa('node', [binPath, cmd, ...(args || [])], {
+        cwd: path.join(testPackagesFolder, onTestPackage),
+        stdio: 'inherit',
+      })
+    );
   }
 
   if (onFixture) {
@@ -70,6 +74,27 @@ export async function run(
   }
 
   return { exitCode: 1, stderr: 'no fixture, nor cwd', stdout: 'nothing ran' };
+}
+
+async function noException(execaProcess: ExecaChildProcess) {
+  let stdout = 'no stdout';
+  let stderr = 'no stderr';
+  let exitCode = 0;
+
+  try {
+    let result = await execaProcess;
+
+    stdout = result.stdout;
+    stderr = result.stderr;
+    exitCode = result.exitCode;
+
+    return { stdout, stderr, exitCode };
+  } catch (e: any) {
+    stderr = e.stderr || e;
+    stdout = e.stdout || stdout;
+
+    return { stdout, stderr, exitCode };
+  }
 }
 
 export async function copyToNewTmp(src: string): Promise<string> {
