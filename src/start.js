@@ -11,9 +11,11 @@ import { Listr } from 'listr2';
 import path, { join } from 'path';
 
 import { applyLayers } from './customizations.js';
-import { removeDefaults } from './dependencies.js';
+import { addAddonTestingDependencies, linkAddon, removeDefaults } from './dependencies.js';
 import { generateApp, getCacheDir, installDependencies } from './init.js';
 import { resolveOptions, verifyOptions } from './options.js';
+
+const HOME = process.env['HOME'] ?? '';
 
 /**
  * @param {import('./types').Args} args
@@ -30,7 +32,7 @@ export async function start(args) {
           task.output = `Verifying options...`;
           await verifyOptions(options);
 
-          let local = cacheDir.replace(process.env.HOME, '~');
+          let local = cacheDir.replace(HOME, '~');
 
           task.output = `Buttered app in ${local}`;
         },
@@ -79,19 +81,29 @@ export async function start(args) {
               {
                 title: 'Configuring dependencies',
                 skip: () => hasDependencies,
-                task: () => removeDefaults(options, cacheDir),
+                task: async () => {
+                  await removeDefaults(options, cacheDir);
+
+                  if (options.addon) {
+                    await addAddonTestingDependencies(options, cacheDir);
+                  }
+                },
               },
               {
                 title: 'Installing dependencies',
                 skip: () => hasDependencies,
-                task: async () => installDependencies(cacheDir),
+                task: async () => {
+                  await installDependencies(cacheDir);
+
+                  if (options.addon) {
+                    await linkAddon(options, cacheDir);
+                  }
+                },
               },
               {
                 title: 'Applying customizations',
                 // skip: () => !shouldRelayer,
                 task: async () => {
-                  rmSync(join(cacheDir, 'app/templates/application.hbs'), { force: true });
-
                   await applyLayers(options, cacheDir);
                 },
               },
@@ -116,6 +128,24 @@ export async function start(args) {
 async function runEmber(options, cacheDir) {
   const commandArgs = ['ember-cli', options.command];
 
+  if (options.command === 'try:each' || options.command === 'try:one') {
+    if (options.commandOption) {
+      commandArgs.push(options.commandOption);
+    } else {
+      commandArgs.push('test');
+    }
+
+    return await execa('npx', commandArgs, {
+      cwd: cacheDir,
+      stdio: 'inherit',
+    });
+  }
+
+  // The following args are not supported by try:each or try:one
+  if (options.environment) {
+    commandArgs.push('--environment', options.environment);
+  }
+
   if (options.outputPath) {
     commandArgs.push('--output-path', join(process.cwd(), options.outputPath));
   } else {
@@ -124,10 +154,6 @@ async function runEmber(options, cacheDir) {
 
   if (options.port !== null && options.port !== undefined && options.command !== 'test') {
     commandArgs.push(`--port=${options.port}`);
-  }
-
-  if (options.environment) {
-    commandArgs.push('--environment', options.environment);
   }
 
   await execa('npx', commandArgs, {

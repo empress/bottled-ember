@@ -21,13 +21,25 @@ let pkg = require(path.join('..', 'package.json'));
 yarg
   .version(pkg.version)
   .command(
-    ['start [command]', '$0'],
+    ['start [command] [commandOption]', '$0'],
     'bootstrap an ember app without any boilerplate',
     (yargs) => {
       yargs.positional('command', {
         type: 'string',
         description: 'Command to pass through to ember-cli',
         default: 'serve',
+      });
+      yargs.positional('commandOption', {
+        type: 'string',
+        description:
+          'For some commands, there may be sub-commands. For example, try:one can take a "scenario-name"',
+      });
+      yargs.option('addon', {
+        type: 'boolean',
+        alias: 'a',
+        description:
+          'when present, addon-mode is used, which opts in to ember-try + a different default ember-cli-build.js. In this mode, many other flags are disabled.',
+        default: false,
       });
       yargs.option('local-files', {
         type: 'string',

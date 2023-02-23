@@ -5,7 +5,7 @@ export default defineConfig({
     root: __dirname,
     testTimeout: 380_000,
     hookTimeout: 380_000,
-    include: ['tests/fixture-test.mts'],
+    include: ['tests/fixture-test.mts', 'tests/addon-test.mts'],
     // ...
   },
 });
