@@ -3,11 +3,21 @@
 /* eslint-disable no-console */
 /* eslint-disable n/shebang */
 
-// import { execa } from 'execa';
+import path from 'node:path';
+
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-import { findFixtures } from '../tests/utils.js';
+import {
+  copyToNewTmp,
+  findEmberTry,
+  findFixtures,
+  fixturesFolder,
+  testPackagesFolder,
+} from '../tests/utils.js';
+
+// How do you do this?
+const isInteractive = process.env['USERNAME'] === 'nvp';
 
 yargs(hideBin(process.argv))
   .command(
@@ -15,8 +25,16 @@ yargs(hideBin(process.argv))
     'lists the known fixtures -- for use for splitting C.I.',
     () => {},
     async () => {
-      let names = await findFixtures();
-      let fixtures = names.map((name) => ({ name }));
+      let fixtureNames = await findFixtures();
+      let emberTryNames = await findEmberTry();
+
+      if (isInteractive) {
+        console.info([...fixtureNames, ...emberTryNames]);
+
+        return;
+      }
+
+      let fixtures = [...fixtureNames, ...emberTryNames].map((name) => ({ name }));
       let output = JSON.stringify({ fixtures });
 
       // STDOUT is used to pipe to C.I. env vars
@@ -29,13 +47,35 @@ yargs(hideBin(process.argv))
     (yargs) => {
       return yargs.positional('name', {
         description: 'the name of the fixture to copy',
+        type: 'string',
+        required: true,
       });
     },
-    async () => {
-      // info('Coping fixture to tmp directory');
-      // let project = await addonFrom(`${argv.name}`);
-      // console.info(project.rootPath);
-      // info('Done! ✨');
+    async (args) => {
+      let fixtureNames = await findFixtures();
+      let emberTryNames = await findEmberTry();
+
+      if (!args.name) {
+        throw new Error('Missing fixture name');
+      }
+
+      if (fixtureNames.includes(args.name)) {
+        let location = await copyToNewTmp(path.join(fixturesFolder, args.name));
+
+        console.info(location);
+
+        return;
+      }
+
+      if (emberTryNames.includes(args.name)) {
+        let location = await copyToNewTmp(path.join(testPackagesFolder, args.name));
+
+        console.info(location);
+
+        return;
+      }
+
+      throw new Error(`Unknown fixture: ${args.name}`);
     }
   )
   .command(

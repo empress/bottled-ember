@@ -29,6 +29,13 @@ yarg
         description: 'Command to pass through to ember-cli',
         default: 'serve',
       });
+      yargs.option('addon', {
+        type: 'boolean',
+        alias: 'a',
+        description:
+          'when present, addon-mode is used, which opts in to ember-try + a different default ember-cli-build.js. In this mode, many other flags are disabled.',
+        default: false,
+      });
       yargs.option('local-files', {
         type: 'string',
         alias: 'l',

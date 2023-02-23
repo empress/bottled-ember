@@ -1,3 +1,6 @@
+# template files
+files/
+
 # compiled output
 dist/
 tmp/

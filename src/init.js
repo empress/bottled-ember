@@ -37,8 +37,7 @@ export async function init(options, cacheDir) {
       'init',
       '--skip-npm',
       '--no-welcome',
-      '--name',
-      options.name,
+      ...(options.addon ? ['--name', 'test-app'] : ['--name', options.name]),
     ],
     {
       cwd: cacheDir,

@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 
 import { packageJson } from 'ember-apply';
+import { execa } from 'execa';
 import { findUp } from 'find-up';
 import fse from 'fs-extra';
 
@@ -31,6 +32,35 @@ const DEFAULT_DEPS_TO_REMOVE = [
   'ember-fetch',
   'ember-data',
 ];
+
+/**
+ * @param {Options} options
+ * @param {string} cacheDir
+ */
+export async function linkAddon(options, cacheDir) {
+  await execa('pnpm', ['link', options.cwd], { cwd: cacheDir });
+
+  await packageJson.modify(async (pJson) => {
+    let addonPkg = await packageJson.read(options.cwd);
+
+    pJson.dependencies ||= {};
+    pJson.dependencies[addonPkg.name] = options.cwd;
+  }, cacheDir);
+}
+
+/**
+ * @param {Options} options
+ * @param {string} cacheDir
+ */
+export async function addAddonTestingDependencies(_options, cacheDir) {
+  await packageJson.modify(async (pJson) => {
+    pJson.devDependencies ||= {};
+    pJson.devDependencies['@embroider/test-setup'] = '^2.0.0';
+    pJson.devDependencies['ember-source-channel-url'] = '^3.0.0';
+    pJson.devDependencies['ember-try'] = '^2.0.0';
+    pJson.devDependencies['ember-cli-deprecation-workflow'] = '^2.0.0';
+  }, cacheDir);
+}
 
 /**
  * @param {Options} options

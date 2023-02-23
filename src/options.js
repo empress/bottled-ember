@@ -5,6 +5,9 @@ import path from 'node:path';
 
 import { cosmiconfig } from 'cosmiconfig';
 import { readJsonSync } from 'fs-extra/esm';
+
+import { HOME } from './env.js';
+
 /**
  * Local Alias:
  * @typedef {import('./types').Options} Options
@@ -31,11 +34,12 @@ export async function resolveOptions(args) {
   const resultFinal2 = {
     cacheName: path
       .dirname(startIn)
-      .replace(process.env.HOME, '_home_')
+      .replace(HOME, '_home_')
       .replaceAll(path.sep, '_')
       .replaceAll('~', '_home_'),
     ...result?.config,
     ...args,
+    cwd: process.cwd(),
     projectRoot: path.join(process.cwd(), args.localFiles),
   };
 
