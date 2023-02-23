@@ -1,0 +1,32 @@
+{
+  "name": "@nullvoxpopuli/addon-with-ember-try-js",
+  "version": "0.0.0",
+  "description": "The default blueprint for ember-cli addons.",
+  "keywords": [
+    "ember-addon"
+  ],
+  "repository": "",
+  "license": "MIT",
+  "author": "",
+  "files": [
+    "addon-main.cjs",
+    "src"
+  ],
+  "dependencies": {
+    "@embroider/addon-shim": "^1.0.0"
+  },
+  "ember": {
+    "edition": "octane"
+  },
+  "ember-addon": {
+    "version": 2,
+    "type": "addon",
+    "main": "addon-main.cjs",
+    "app-js": {}
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./*": "./src/*.js",
+    "./addon-main.js": "./addon-main.cjs"
+  }
+}

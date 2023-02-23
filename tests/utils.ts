@@ -19,17 +19,19 @@ interface DirOrFixture {
   args?: string[];
   onTestPackage?: string;
   cmd?: 'test' | 'serve' | 'try:one' | 'try:each';
+  prepare?: (tmpDir: string) => void | Promise<void>;
 }
 
 const VERBOSE = yn(process.env['VERBOSE']);
 
 export async function run(
   cmd: NonNullable<DirOrFixture['cmd']>,
-  { cwd, onFixture, onTestPackage, args }: DirOrFixture
+  { cwd, prepare, onFixture, onTestPackage, args }: DirOrFixture
 ) {
   if (onTestPackage) {
     let originDirectory = path.join(testPackagesFolder, onTestPackage);
     let workingDirectory = await copyToNewTmp(originDirectory);
+
 
     if (VERBOSE) {
       console.debug(
@@ -38,6 +40,10 @@ export async function run(
           `In ${workingDirectory}\n` +
           `Copied from ${originDirectory}`
       );
+    }
+
+    if (prepare) {
+      await prepare(workingDirectory);
     }
 
     return execa('node', [binPath, cmd, ...(args || [])], {

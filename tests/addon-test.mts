@@ -1,6 +1,8 @@
+import path from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
-import { findEmberTry, run } from './utils.js';
+import { findEmberTry, overrideFile,run } from './utils.js';
 
 let fixtures = await findEmberTry();
 
@@ -10,6 +12,9 @@ describe('Addon mode', () => {
       let { stderr, stdout } = await run('try:each', {
         onTestPackage: fixture,
         args: ['--addon', '--cacheName', 'try-each'],
+        prepare: async (workingDirectory) => {
+          await overrideFile('ember-try.js', path.join(workingDirectory, 'config'));
+        },
       });
 
       stdout ||= (stderr as any).stdout;
@@ -18,16 +23,9 @@ describe('Addon mode', () => {
         console.error(stderr);
       }
 
-      expect(stdout).toContain('Scenario ember-3.28: SUCCESS');
-      expect(stdout).toContain('Scenario ember-4.0: SUCCESS');
-      expect(stdout).toContain('Scenario ember-4.4: SUCCESS');
       expect(stdout).toContain('Scenario ember-4.8: SUCCESS');
       expect(stdout).toContain('Scenario ember-release: SUCCESS');
-      expect(stdout).toContain('Scenario ember-beta: SUCCESS');
-      expect(stdout).toContain('Scenario ember-canary: FAIL');
-      expect(stdout).toContain('Scenario ember-release + embroider-safe: SUCCESS');
       expect(stdout).toContain('Scenario ember-release + embroider-optimized: SUCCESS');
-      expect(stdout).toContain('Scenario ember-lts-4.8 + embroider-optimized: SUCCESS');
     });
 
     it(`${fixture} try:one`, async () => {

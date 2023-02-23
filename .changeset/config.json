@@ -14,5 +14,10 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": [
+    "@nullvoxpopuli/docfy-template-provider",
+    "@nullvoxpopuli/addon-with-ember-try-js",
+    "@nullvoxpopuli/addon-with-ember-try-ts",
+    "@nullvoxpopuli/fixture-docfy-class-with-package-template"
+  ]
 }
