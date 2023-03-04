@@ -12,9 +12,9 @@
     "test": "mocha"
   },
   "dependencies": {
+    "commander": "^10.0.0",
     "execa": "^6.1.0",
-    "find-cache-dir": "^3.3.2",
-    "minimist": "^1.2.6"
+    "find-cache-dir": "^3.3.2"
   },
   "engines": {
     "node": "14.* || 16.* || >= 18"
