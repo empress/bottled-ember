@@ -21,9 +21,15 @@ const argv = minimist(process.argv.slice(2));
 
 const emberVersion = argv.emberVersion || '4.0';
 
-const cacheDir = findCacheDir({
-  name: `bottled-ember-${emberVersion.replace(/\./g, '-')}-${argv['cache-name'] ?? 'default'}`,
-});
+let cacheDir;
+
+if (process.env.BOTTLED_CACHE_DIR) {
+  cacheDir = process.env.BOTTLED_CACHE_DIR;
+} else {
+  cacheDir = findCacheDir({
+    name: `bottled-ember-${emberVersion.replace(/\./g, '-')}-${argv['cache-name'] ?? 'default'}`,
+  });
+}
 
 async function run() {
   const execa = (await import('execa')).execa;
@@ -61,13 +67,18 @@ async function run() {
 
     writeFileSync(join(cacheDir, '.npmrc'), 'auto-install-peers=true');
 
-    console.log('installing dependencies 🤖');
+    if (!process.env.BOTTLED_SKIP_DEPENDENCIES) {
+      console.log('installing dependencies 🤖');
 
-    await execa('npx', ['pnpm', 'install'], {
-      cwd: cacheDir,
-    });
+      await execa('npx', ['pnpm', 'install'], {
+        cwd: cacheDir,
+      });
 
-    console.log('finished installing dependencies 🤖');
+      console.log('finished installing dependencies 🤖');
+    } else {
+      console.log('skipping installing dependencies 🤖');
+    }
+
     console.log('customising bottled-ember app 🤖');
 
     await rmSync(join(cacheDir, 'app/templates/application.hbs'));
@@ -139,7 +150,7 @@ async function run() {
         }, buildConfig);
         return app.toTree();
       };
-      `
+`
     );
 
     console.log('installing linking your local app 🤖');
@@ -221,15 +232,18 @@ async function run() {
     commandArgs.push('--environment', argv.environment);
   }
 
-  await execa(
-    'npx',
-    commandArgs,
-    {
-      cwd: cacheDir,
-      stderr: 'inherit',
-      stdout: 'inherit',
-    }
-  );
+  if (!process.env.BOTTLED_SKIP_COMMAND) {
+    await execa(
+      'npx',
+      commandArgs,
+      {
+        cwd: cacheDir,
+        stderr: 'inherit',
+        stdout: 'inherit',
+      }
+    );
+  }
+
 }
 
 run();
