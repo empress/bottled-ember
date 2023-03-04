@@ -2,7 +2,7 @@
 'use strict';
 
 const findCacheDir = require('find-cache-dir');
-const minimist = require('minimist');
+const { program } = require('commander');
 
 const {
   existsSync,
@@ -15,15 +15,42 @@ const {
   rmdirSync,
   readlinkSync,
 } = require('fs');
+
 const { join } = require('path');
 
-const argv = minimist(process.argv.slice(2));
+program
+  .name('Bottled Ember')
+  .description('A handy version of Ember that you can take with you whever you go!')
+  .version(require(`${__dirname}/../package.json`).version);
 
-const emberVersion = argv.emberVersion || '4.0';
+program.enablePositionalOptions();
 
-const cacheDir = findCacheDir({
-  name: `bottled-ember-${emberVersion.replace(/\./g, '-')}-${argv['cache-name'] ?? 'default'}`,
-});
+program
+  .option('--ember-version <string>', 'The Ember version that you want bottled ember to generate for you. Default: 4.0', '4.0')
+  .option('--cache-name <string>', 'A suffix to add to your cached Bottled Ember folder so you can have multiple apps with the same version', 'default')
+  .option('--no-overlay', 'Tuns off the default behaviour of overlaying `app` and `tests` folders into your Bottled Ember app')
+  .option('--deps <string>', 'A comma seperated list of extra dependencies you would like to install into your Bottled Ember App')
+  .option('--links <string>', 'A comma seperated list of folders you want to link into the Bottled Ember App. You can provide these in the format `source:destination` or you can just provide one folder name and it will be used as both source and destination')
+  .option('--output-path <string>', 'The dist folder for your Bottled Ember App. You only need to set this when you are running multiple apps at the same time', 'dist')
+  .option('-p, --port <number>', 'The port to run you Bottled Ember App on if you are running locally')
+  .option('--environment <string>', 'Passes the environment through to the Bottled Ember app e.g. --environment production');
+
+program.argument('[command]', 'The command you want to pass to your Bottled Ember App.', 'serve');
+
+program.parse();
+const options = program.opts();
+
+const emberVersion = options.emberVersion;
+
+let cacheDir;
+
+if (process.env.BOTTLED_CACHE_DIR) {
+  cacheDir = process.env.BOTTLED_CACHE_DIR;
+} else {
+  cacheDir = findCacheDir({
+    name: `bottled-ember-${emberVersion.replace(/\./g, '-')}-${options.cacheName}`,
+  });
+}
 
 async function run() {
   const execa = (await import('execa')).execa;
@@ -61,13 +88,18 @@ async function run() {
 
     writeFileSync(join(cacheDir, '.npmrc'), 'auto-install-peers=true');
 
-    console.log('installing dependencies 🤖');
+    if (!process.env.BOTTLED_SKIP_DEPENDENCIES) {
+      console.log('installing dependencies 🤖');
 
-    await execa('npx', ['pnpm', 'install'], {
-      cwd: cacheDir,
-    });
+      await execa('npx', ['pnpm', 'install'], {
+        cwd: cacheDir,
+      });
 
-    console.log('finished installing dependencies 🤖');
+      console.log('finished installing dependencies 🤖');
+    } else {
+      console.log('skipping installing dependencies 🤖');
+    }
+
     console.log('customising bottled-ember app 🤖');
 
     await rmSync(join(cacheDir, 'app/templates/application.hbs'));
@@ -124,11 +156,11 @@ async function run() {
       let trees = {};
 
       // todo make no-overlay work at runtime so you don't need to clear cache
-      if (${argv['no-overlay'] ? false : true} && existsSync(join('${process.cwd()}', 'app'))) {
+      if (${options.overlay ? true : false} && existsSync(join('${process.cwd()}', 'app'))) {
         trees.app = mergeTrees([join(__dirname, 'app'), join('${process.cwd()}', 'app')], { overwrite: true })
       }
 
-      if (${argv['no-overlay'] ? false : true} && existsSync(join('${process.cwd()}', 'tests'))) {
+      if (${options.overlay ? true : false} && existsSync(join('${process.cwd()}', 'tests'))) {
         trees.tests = mergeTrees([join(__dirname, 'tests'), join('${process.cwd()}', 'tests')], { overwrite: true })
       }
 
@@ -139,7 +171,7 @@ async function run() {
         }, buildConfig);
         return app.toTree();
       };
-      `
+`
     );
 
     console.log('installing linking your local app 🤖');
@@ -153,8 +185,8 @@ async function run() {
     console.log('re-using existing bottled-ember app 🤖');
   }
 
-  if (argv.deps) {
-    const deps = argv.deps.split(',');
+  if (options.deps) {
+    const deps = options.deps.split(',');
 
     const pkg = require(`${cacheDir}/package.json`);
 
@@ -170,8 +202,8 @@ async function run() {
     }
   }
 
-  if (argv.links) {
-    const links = argv.links.split(',');
+  if (options.links) {
+    const links = options.links.split(',');
 
     links.forEach((link) => {
       let source, destination;
@@ -205,31 +237,30 @@ async function run() {
     });
   }
 
-  const commandArgs = ['ember', argv._[0] || 'serve'];
+  const commandArgs = ['ember', program.args[0] || 'serve'];
 
-  if (argv['output-path']) {
-    commandArgs.push('--output-path', join(process.cwd(), argv['output-path']));
-  } else {
-    commandArgs.push('--output-path', join(process.cwd(), 'dist'));
+  commandArgs.push('--output-path', join(process.cwd(), options.outputPath));
+
+  if (options.port) {
+    commandArgs.push(`--port=${options.port}`);
   }
 
-  if (argv.p !== null && argv.p !== undefined) {
-    commandArgs.push(`--port=${argv.p}`);
+  if (options.environment) {
+    commandArgs.push('--environment', options.environment);
   }
 
-  if (argv.environment) {
-    commandArgs.push('--environment', argv.environment);
+  if (!process.env.BOTTLED_SKIP_COMMAND) {
+    await execa(
+      'npx',
+      commandArgs,
+      {
+        cwd: cacheDir,
+        stderr: 'inherit',
+        stdout: 'inherit',
+      }
+    );
   }
 
-  await execa(
-    'npx',
-    commandArgs,
-    {
-      cwd: cacheDir,
-      stderr: 'inherit',
-      stdout: 'inherit',
-    }
-  );
 }
 
 run();
