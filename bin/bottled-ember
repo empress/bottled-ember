@@ -59,8 +59,6 @@ async function run() {
     console.log('generating your bottled-ember app now 🤖');
     mkdirSync(cacheDir, { recursive: true });
 
-    await execa('npm', ['-v']);
-
     // this prevents ember-cli from thinking it's already in an ember addon/app
     // when running from the cache directory. Adding a package.json just short-circuits
     // the mechanism that ember-cli uses to identify that it's already in an app/addon
@@ -71,18 +69,26 @@ async function run() {
       [`ember-cli@${emberVersion}`, 'init', '--skip-npm', '--no-welcome'],
       {
         cwd: cacheDir,
+        stderr: 'inherit',
       }
     );
 
     initCommand.stdout.setEncoding('utf8');
 
     initCommand.stdout.on("data", (data) => {
+      console.log(data);
+
       if(data.includes("Overwrite package.json?")) {
         initCommand.stdin.write("y\n");
       }
     })
 
-    await initCommand;
+    try {
+      await initCommand;
+    } catch (err) {
+      console.error('Error initialising your bottled-ember app 🤖❌', err);
+      process.exit(1);
+    }
 
     console.log(`bottled-ember app finished initialising 🤖`);
 
