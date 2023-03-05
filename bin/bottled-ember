@@ -17,6 +17,7 @@ const {
 } = require('fs');
 
 const { join } = require('path');
+const stripAnsi = require('strip-ansi');
 
 program
   .name('Bottled Ember')
@@ -77,7 +78,7 @@ async function run() {
     initCommand.stdout.setEncoding('utf8');
 
     initCommand.stdout.on("data", (data) => {
-      if(data.includes("Overwrite package.json?")) {
+      if(data.includes(stripAnsi("Overwrite package.json?"))) {
         initCommand.stdin.write("y\n");
       }
     })
