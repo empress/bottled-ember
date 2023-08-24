@@ -54,6 +54,7 @@ if (process.env.BOTTLED_CACHE_DIR) {
 }
 
 async function run() {
+  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const execa = (await import('execa')).execa;
 
   if (!existsSync(cacheDir)) {
