@@ -1,4 +1,13 @@
 
+
+## v1.0.1 (2023-09-19)
+
+#### :bug: Bug Fix
+* [#22](https://github.com/empress/bottled-ember/pull/22) use copy instead of rename ([@mansona](https://github.com/mansona))
+
+#### Committers: 1
+- Chris Manson ([@mansona](https://github.com/mansona))
+
 ## v1.0.0 (2023-08-25)
 
 #### :boom: Breaking Change
