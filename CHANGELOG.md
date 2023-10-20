@@ -1,5 +1,15 @@
 
 
+
+## v1.1.0 (2023-10-20)
+
+#### :rocket: Enhancement
+* [#23](https://github.com/empress/bottled-ember/pull/23) Allow you to configure Fastboot dependencies ([@mansona](https://github.com/mansona))
+
+#### Committers: 1
+- Chris Manson ([@mansona](https://github.com/mansona))
+
+
 ## v1.0.1 (2023-09-19)
 
 #### :bug: Bug Fix
